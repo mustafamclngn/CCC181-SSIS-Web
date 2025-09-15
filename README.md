@@ -1,1 +1,1 @@
-# web ssis
+Simple Student Information Web
