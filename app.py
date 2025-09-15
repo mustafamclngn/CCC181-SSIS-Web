@@ -3,12 +3,9 @@ from flask import Flask, render_template
 app = Flask(__name__)
 
 @app.route("/")
-def hello():
-    return render_template("index.html")
-
-@app.route("/about")
-def about():
-    return "My name is Muhamamd Mustafa M. Macalangan"
+@app.route("/dasboard")
+def dashboard():
+    return render_template("dashboard.html")
 
 @app.route("/colleges")
 def colleges():

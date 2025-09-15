@@ -12,7 +12,7 @@
 <body class="sb-nav-fixed">
     <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
         <!-- Navbar Brand-->
-        <a class="navbar-brand ps-3" href="{{ url_for('hello') }}">SSIS</a>
+        <a class="navbar-brand ps-3" href="{{ url_for('dashboard') }}">SSIS</a>
         <!-- Sidebar Toggle-->
         <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle">
             <i class="fas fa-bars"></i>
@@ -24,6 +24,10 @@
             <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
                 <div class="sb-sidenav-menu">
                     <div class="nav">
+                        <a class="nav-link" href="{{ url_for('dashboard') }}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                            Dasboard
+                        </a>
                         <a class="nav-link" href="{{ url_for('colleges') }}">
                             <div class="sb-nav-link-icon"><i class="fas fa-university"></i></div>
                             Colleges
