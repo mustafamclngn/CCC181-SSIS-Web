@@ -1,0 +1,125 @@
+/* Google Font Import */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+/* Global Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  background-color: #e4e9f7;
+  transition: all 0.3s ease;
+}
+
+/* Header */
+#header-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 55px;
+  background-color: #242526;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  color: #fff;
+  z-index: 1000;
+}
+
+#header-bar .logo {
+  font-size: 20px;
+  font-weight: 600;
+  margin-left: 10px;
+}
+
+#toggle-btn {
+  font-size: 22px;
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+#toggle-btn:hover {
+  transform: rotate(90deg);
+}
+
+/* Sidebar */
+#sidebar {
+  position: fixed;
+  top: 55px;
+  left: 0;
+  width: 250px;
+  height: calc(100% - 55px);
+  background-color: #242526;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  padding-top: 20px;
+  overflow: hidden;
+}
+
+#sidebar.active {
+  width: 80px;
+}
+
+#sidebar .sidebar-header {
+  font-size: 18px;
+  font-weight: 600;
+  padding: 0 20px 20px 20px;
+  color: #242526;
+}
+
+#sidebar a {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #707070;
+  padding: 12px 20px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+#sidebar a i {
+  font-size: 20px;
+  margin-right: 15px;
+  min-width: 20px;
+  text-align: center;
+}
+
+#sidebar a:hover {
+  background-color: #2212d3;
+  color: #fff;
+}
+
+#sidebar.active a {
+  justify-content: center;
+}
+
+#sidebar.active a span {
+  display: none;
+}
+
+/* Home / Content */
+body #main-content {
+  margin-left: 250px;
+  padding: 60px 20px 20px 20px;
+  transition: margin-left 0.3s ease;
+}
+
+#sidebar.active ~ #main-content {
+  margin-left: 80px;
+}
+
+/* Optional: Smooth icon scaling on hover */
+#sidebar a i {
+  transition: transform 0.3s ease;
+}
+
+#sidebar a:hover i {
+  transform: scale(1.2);
+}
