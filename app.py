@@ -29,7 +29,18 @@ def programs():
 
 @app.route("/students")
 def students():
-    return render_template("students.html")
+    students = [
+        {
+            "idnumber": f"2025-{i:04d}",
+            "first_name": f"First{i}",
+            "last_name": f"Last{i}",
+            "program_code": f"BS{((i - 1) % 5) + 1:02d}",  # rotate BS01–BS05
+            "year_level": (i % 4) + 1,
+            "gender": "Male" if i % 2 == 0 else "Female"
+        }
+        for i in range(1, 21)
+    ]
+    return render_template("students.html", students=students)
 
 if __name__ == "__main__":
     app.run(debug=True)
