@@ -60,7 +60,7 @@
         ></button>
       </div>
       <div class="modal-body">
-        <form id="registerForm">
+        <form id="registerCollegeForm">
           <div class="mb-3">
             <label for="collegeCode" class="form-label">College Code:</label>
             <input
@@ -83,8 +83,56 @@
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="submit" form="registerForm" class="btn btn-success">
+        <button
+          type="submit"
+          form="registerCollegeForm"
+          class="btn btn-success"
+        >
           <i class="bi bi-plus-lg"></i> Register
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- edit college modal -->
+<div
+  class="modal fade"
+  id="editCollegeModal"
+  tabindex="-1"
+  aria-labelledby="editModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">Edit College</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form id="editForm">
+          <div class="mb-3">
+            <label for="editCollegeCode" class="form-label"
+              >College Code:</label
+            >
+            <input type="text" class="form-control" id="editCollegeCode" />
+          </div>
+          <div class="mb-3">
+            <label for="editCollegeName" class="form-label"
+              >College Name:</label
+            >
+            <input type="text" class="form-control" id="editCollegeName" />
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" form="editForm" class="btn btn-success">
+          <i class="bi bi-check-lg"></i> Save Changes
         </button>
       </div>
     </div>
@@ -101,6 +149,18 @@
       columnDefs: [{ orderable: false, searchable: false, targets: 2 }],
       pageLength: 10,
       lengthMenu: [10, 25, 50],
+    });
+
+    // edit college button clicked
+    $(".btn-edit").click(function (e) {
+      e.preventDefault();
+      const row = $(this).closest("tr");
+      const code = row.find("td:eq(0)").text();
+      const name = row.find("td:eq(1)").text();
+
+      $("#editCollegeCode").val(code);
+      $("#editCollegeName").val(name);
+      $("#editCollegeModal").modal("show");
     });
   });
 </script>
