@@ -9,7 +9,11 @@ def dashboard():
 
 @app.route("/colleges")
 def colleges():
-    return render_template("colleges.html")
+    colleges = [
+        {"code": f"C{i:02d}", "name": f"College of Example {i}"}
+        for i in range(1, 21)
+    ]
+    return render_template("colleges.html", colleges=colleges)
 
 @app.route("/programs")
 def programs():
