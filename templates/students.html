@@ -1,7 +1,8 @@
 {% extends "index.html" %} {% block content %}
 
+<div class="card shadow-sm p-4 rounded-3">
 <div class="d-flex justify-content-between align-items-center mb-3">
-  <h3>Students</h3>
+  <h3>Student Records</h3>
 
   <!-- register student button -->
   <a
@@ -138,6 +139,64 @@
   </div>
 </div>
 
+<!-- edit student modal -->
+<div class="modal fade" id="editStudentModal" tabindex="-1" aria-labelledby="editStudentModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editStudentModalLabel">Edit Student</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="editStudentForm">
+          <div class="mb-3">
+            <label for="editIdNumber" class="form-label">ID Number:</label>
+            <input type="text" class="form-control" id="editIdNumber" name="idnumber" readonly />
+          </div>
+          <div class="mb-3">
+            <label for="editFirstName" class="form-label">First Name:</label>
+            <input type="text" class="form-control" id="editFirstName" name="first_name" />
+          </div>
+          <div class="mb-3">
+            <label for="editLastName" class="form-label">Last Name:</label>
+            <input type="text" class="form-control" id="editLastName" name="last_name" />
+          </div>
+          <div class="mb-3">
+            <label for="editProgramCode" class="form-label">Program:</label>
+            <select class="form-select" id="editProgramCode" name="program_code">
+              {% for program in programs %}
+              <option value="{{ program.code }}">{{ program.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="editYearLevel" class="form-label">Year Level:</label>
+            <select class="form-select" id="editYearLevel" name="year_level">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="editGender" class="form-label">Gender:</label>
+            <select class="form-select" id="editGender" name="gender">
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" form="editStudentForm" class="btn btn-primary">
+          <i class="bi bi-save"></i> Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- initialize students datatable -->
 <script>
   $(document).ready(function () {
@@ -146,10 +205,42 @@
       ordering: true,
       paging: true,
       columnDefs: [{ orderable: false, searchable: false, targets: 2 }],
-      pageLength: 10,
-      lengthMenu: [10, 25, 50],
+      pageLength: 15,
+      lengthMenu: [15, 25, 50],
     });
   });
+
+    // edit student button clicked
+    $(".btn-edit").click(function (e) {
+      e.preventDefault();
+      const row = $(this).closest("tr");
+      const idnumber = row.find("td:eq(0)").text();
+      const firstName = row.find("td:eq(1)").text();
+      const lastName = row.find("td:eq(2)").text();
+      const programCode = row.find("td:eq(3)").text().trim();
+      const yearLevel = row.find("td:eq(4)").text().trim();
+      const gender = row.find("td:eq(5)").text().trim();
+
+      // populate text inputs
+      $("#editIdNumber").val(idnumber);
+      $("#editFirstName").val(firstName);
+      $("#editLastName").val(lastName);
+
+      // select correct program option by value
+      $("#editProgramCode option").filter(function () {
+        return $(this).val() === programCode;
+      }).prop("selected", true);
+
+      // select year level (must be 1,2,3,4)
+      $("#editYearLevel").val(yearLevel);
+
+      // select gender (Male/Female)
+      $("#editGender").val(gender);
+
+    // show edit modal
+      $("#editStudentModal").modal("show");
+    });
+
 </script>
 
 {% endblock %}
