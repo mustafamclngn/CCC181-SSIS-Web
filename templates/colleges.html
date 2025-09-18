@@ -1,28 +1,58 @@
-<!-- {% extends "index.html" %} {% block content %}
-<h1 class="mt-4">College Page</h1>
-<p>Manage colleges here.</p>
+{% extends "index.html" %} {% block content %}
 
-<table class="table table-hover table-bordered">
+<!-- colleges datatable -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3>Colleges</h3>
+
+  <!-- register college button -->
+  <a
+    href="#"
+    class="btn btn-success"
+    data-bs-toggle="modal"
+    data-bs-target="#registerCollegeModal"
+  >
+    <i class="bi bi-plus-lg"></i> Register College
+  </a>
+</div>
+
+<table id="collegesTable" class="table table-striped table-bordered">
   <thead>
     <tr>
       <th scope="col">College Code</th>
       <th scope="col">College Name</th>
+      <th scope="col">Actions</th>
     </tr>
   </thead>
   <tbody>
+    {% for college in colleges %}
     <tr>
-      <td>CCS</td>
-      <td>College of Computer Science</td>
+      <td>{{ college.code }}</td>
+      <td>{{ college.name }}</td>
+      <td>
+        <a href="#" class="btn btn-primary btn-sm btn-edit">
+          <i class="bi bi-pencil-square"></i> Edit
+        </a>
+        <a href="#" class="btn btn-danger btn-sm btn-delete">
+          <i class="bi bi-trash"></i> Delete
+        </a>
+      </td>
     </tr>
-    <tr>
-      <td>COE</td>
-      <td>College of Engineering</td>
-    </tr>
-    <tr>
-      <td>CSM</td>
-      <td>College of Science and Mathematics</td>
-    </tr>
+    {% endfor %}
   </tbody>
 </table>
+
+<!-- initialize colleges datatable -->
+<script>
+  $(document).ready(function () {
+    $("#collegesTable").DataTable({
+      searching: true,
+      ordering: true,
+      paging: true,
+      columnDefs: [{ orderable: false, searchable: false, targets: 2 }],
+      pageLength: 5,
+      lengthMenu: [5, 10, 25, 50],
+    });
+  });
+</script>
 
 {% endblock %}
