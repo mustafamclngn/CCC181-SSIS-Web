@@ -1,15 +1,20 @@
 {% extends "index.html" %} {% block content %}
 
-<!-- programs datatable -->
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h3>Programs</h3>
 
   <!-- register program button -->
-  <a href="#" class="btn btn-success" data-bs-toggle="modal">
+  <a
+    href="#"
+    class="btn btn-success"
+    data-bs-toggle="modal"
+    data-bs-target="#registerProgramModal"
+  >
     <i class="bi bi-plus-lg"></i> Register Program
   </a>
 </div>
 
+<!-- programs datatable -->
 <table id="programsTable" class="table table-striped table-bordered">
   <thead>
     <tr>
@@ -37,6 +42,70 @@
     {% endfor %}
   </tbody>
 </table>
+
+<!-- REGISTER PROGRAM MODAL -->
+<div
+  class="modal fade"
+  id="registerProgramModal"
+  tabindex="-1"
+  aria-labelledby="registerProgramModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="registerProgramModalLabel">
+          Register Program
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form id="registerProgramForm">
+          <div class="mb-3">
+            <label for="programCode" class="form-label">Program Code:</label>
+            <input
+              type="text"
+              class="form-control"
+              id="programCode"
+              placeholder="e.g. BSCS"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="programName" class="form-label">Program Name:</label>
+            <input
+              type="text"
+              class="form-control"
+              id="programName"
+              placeholder="e.g. Bachelor of Science in Computer Science"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="programCollege" class="form-label">College:</label>
+            <select class="form-select" id="programCollege">
+              {% for college in colleges %}
+              <option value="{{ college.id }}">{{ college.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button
+          type="submit"
+          form="registerProgramForm"
+          class="btn btn-success"
+        >
+          <i class="bi bi-plus-lg"></i> Register
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- initialize programs datatable -->
 <script>
