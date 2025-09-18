@@ -107,6 +107,58 @@
   </div>
 </div>
 
+<!-- edit program modal -->
+<div
+  class="modal fade"
+  id="editProgramModal"
+  tabindex="-1"
+  aria-labelledby="editProgramModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editProgramModalLabel">Edit Program</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form id="editProgramForm">
+          <div class="mb-3">
+            <label for="editProgramCode" class="form-label"
+              >Program Code:</label
+            >
+            <input type="text" class="form-control" id="editProgramCode" />
+          </div>
+          <div class="mb-3">
+            <label for="editProgramName" class="form-label"
+              >Program Name:</label
+            >
+            <input type="text" class="form-control" id="editProgramName" />
+          </div>
+          <div class="mb-3">
+            <label for="editProgramCollege" class="form-label">College:</label>
+            <select class="form-select" id="editProgramCollege">
+              {% for college in colleges %}
+              <option value="{{ college.id }}">{{ college.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" form="editProgramForm" class="btn btn-success">
+          <i class="bi bi-check-lg"></i> Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- initialize programs datatable -->
 <script>
   $(document).ready(function () {
@@ -115,8 +167,27 @@
       ordering: true,
       paging: true,
       columnDefs: [{ orderable: false, searchable: false, targets: 2 }],
-      pageLength: 10,
-      lengthMenu: [10, 25, 50],
+      pageLength: 15,
+      lengthMenu: [15, 25, 50],
+    });
+
+    // edit program button clicked
+    $(".btn-edit").click(function (e) {
+      e.preventDefault();
+      const row = $(this).closest("tr");
+      const code = row.find("td:eq(0)").text();
+      const name = row.find("td:eq(1)").text();
+      const college = row.find("td:eq(2)").text();
+
+      $("#editProgramCode").val(code);
+      $("#editProgramName").val(name);
+      $("#editProgramCollege option")
+        .filter(function () {
+          return $(this).text() === college;
+        })
+        .prop("selected", true);
+
+      $("#editProgramModal").modal("show");
     });
   });
 </script>
