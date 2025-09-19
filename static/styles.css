@@ -4,9 +4,11 @@
 }
 
 body {
+  background-color: #dde1ea;
   display: flex;
   margin: 0;
   font-family: "Poppins", sans-serif;
+  font-size: 19px;
 }
 
 /* sidebar */
@@ -31,6 +33,7 @@ body {
   text-decoration: none;
   color: #333;
   transition: 0.3s;
+  font-size: 20px;
 }
 
 #sidebar a:hover,
@@ -41,6 +44,7 @@ body {
 
 /* collapsed sidebar*/
 #sidebar.collapsed {
+  justify-content: center;
   width: var(--sidebar-collapsed-width);
 }
 
@@ -82,4 +86,24 @@ body {
 
 #sidebar.collapsed ~ #main-content {
   margin-left: var(--sidebar-collapsed-width);
+}
+
+/* body button */
+.btn-edit,
+.btn-delete,
+.btn-success {
+  font-size: 1.1rem;
+  padding: 0.4rem 1rem;
+}
+
+.btn-success i,
+.btn-edit i,
+.btn-delete i {
+  margin-right: 0.4rem;
+  font-size: 1.2rem;
+}
+
+/* search bar */
+.dataTables_filter input {
+  width: 300px !important;
 }
