@@ -88,7 +88,25 @@ table td:last-child {
   vertical-align: middle;
 }
 
-/* body button */
+.dataTables_filter input,
+.dt-input {
+  width: 300px !important;
+}
+
+.dt-info {
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.dt-paging .page-link {
+  color: #333;
+}
+.dt-paging .page-item.active .page-link {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+  color: #fff;
+}
+
 .btn-edit,
 .btn-delete,
 .btn-success {
@@ -101,9 +119,4 @@ table td:last-child {
 .btn-delete i {
   margin-right: 0.4rem;
   font-size: 1.2rem;
-}
-
-/* search bar */
-.dataTables_filter input {
-  width: 300px !important;
 }

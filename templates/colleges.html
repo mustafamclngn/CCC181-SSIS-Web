@@ -191,37 +191,5 @@
       </div>
     </div>
   </div>
-
-  <!-- initialize colleges datatable -->
-  <script>
-    $(document).ready(function () {
-      $("#collegesTable").DataTable({
-        searching: true,
-        ordering: true,
-        paging: true,
-        columnDefs: [{ orderable: false, searchable: false, targets: 2 }],
-        pageLength: 15,
-        lengthMenu: [15, 25, 50],
-      });
-
-      // edit college button clicked
-      $(".btn-edit").click(function (e) {
-        e.preventDefault();
-        const row = $(this).closest("tr");
-        const code = row.find("td:eq(0)").text();
-        const name = row.find("td:eq(1)").text();
-
-        $("#editCollegeCode").val(code);
-        $("#editCollegeName").val(name);
-        $("#editCollegeModal").modal("show");
-      });
-
-      // delete college button clicked
-      $(".btn-delete").click(function (e) {
-        e.preventDefault();
-        $("#deleteCollegeModal").modal("show");
-      });
-    });
-  </script>
 </div>
 {% endblock %}

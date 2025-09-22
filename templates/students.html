@@ -275,54 +275,5 @@
       </div>
     </div>
   </div>
-
-  <!-- initialize students datatable -->
-  <script>
-    $(document).ready(function () {
-      $("#studentsTable").DataTable({
-        searching: true,
-        ordering: true,
-        paging: true,
-        columnDefs: [{ orderable: false, searchable: false, targets: 6 }],
-        pageLength: 15,
-        lengthMenu: [15, 25, 50],
-      });
-    });
-
-    // edit student button clicked
-    $(".btn-edit").click(function (e) {
-      e.preventDefault();
-      const row = $(this).closest("tr");
-      const idnumber = row.find("td:eq(0)").text();
-      const firstName = row.find("td:eq(1)").text();
-      const lastName = row.find("td:eq(2)").text();
-      const programCode = row.find("td:eq(3)").text().trim();
-      const yearLevel = row.find("td:eq(4)").text().trim();
-      const gender = row.find("td:eq(5)").text().trim();
-
-      $("#editIdNumber").val(idnumber);
-      $("#editFirstName").val(firstName);
-      $("#editLastName").val(lastName);
-
-      $("#editProgramCode option")
-        .filter(function () {
-          return $(this).val() === programCode;
-        })
-        .prop("selected", true);
-
-      $("#editYearLevel").val(yearLevel);
-
-      $("#editGender").val(gender);
-
-      $("#editStudentModal").modal("show");
-    });
-
-    // delete student button clicked
-    $(".btn-delete").click(function (e) {
-      e.preventDefault();
-      $("#deleteStudentModal").modal("show");
-    });
-  </script>
-
-  {% endblock %}
 </div>
+{% endblock %}

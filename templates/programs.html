@@ -214,44 +214,5 @@
       </div>
     </div>
   </div>
-
-  <!-- initialize programs datatable -->
-  <script>
-    $(document).ready(function () {
-      $("#programsTable").DataTable({
-        searching: true,
-        ordering: true,
-        paging: true,
-        columnDefs: [{ orderable: false, searchable: false, targets: 3 }],
-        pageLength: 15,
-        lengthMenu: [15, 25, 50],
-      });
-
-      // edit program button clicked
-      $(".btn-edit").click(function (e) {
-        e.preventDefault();
-        const row = $(this).closest("tr");
-        const code = row.find("td:eq(0)").text();
-        const name = row.find("td:eq(1)").text();
-        const college = row.find("td:eq(2)").text();
-
-        $("#editProgramCode").val(code);
-        $("#editProgramName").val(name);
-        $("#editProgramCollege option")
-          .filter(function () {
-            return $(this).text() === college;
-          })
-          .prop("selected", true);
-
-        $("#editProgramModal").modal("show");
-      });
-
-      // delete program button clicked
-      $(".btn-delete").click(function (e) {
-        e.preventDefault();
-        $("#deleteProgramModal").modal("show");
-      });
-    });
-  </script>
 </div>
 {% endblock %}
