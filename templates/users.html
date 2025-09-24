@@ -1,0 +1,30 @@
+{% extends "index.html" %} {% block content %}
+
+<div class="container-fluid p-4 rounded-4 bg-white shadow-sm">
+  <h3 class="mb-3">Users</h3>
+
+  <table id="usersTable" class="table table-striped table-bordered">
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Email</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>admin</td>
+        <td>admin@example.com</td>
+      </tr>
+      <tr>
+        <td>johndoe</td>
+        <td>johndoe@example.com</td>
+      </tr>
+      <tr>
+        <td>janedoe</td>
+        <td>janedoe@example.com</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}
