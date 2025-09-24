@@ -1,5 +1,21 @@
-// Wait for DOM to be fully loaded
 $(document).ready(function () {
+  // Sidebar
+  document.querySelectorAll(".sidebar-link.nav-link").forEach((link) => {
+    link.addEventListener("click", function (e) {
+      document
+        .querySelectorAll(".sidebar-link.nav-link")
+        .forEach((l) => l.classList.remove("active"));
+      this.classList.add("active");
+    });
+  });
+
+  const currentPath = window.location.pathname;
+  $("#sidebar a").each(function () {
+    if (this.getAttribute("href") === currentPath) {
+      $(this).addClass("active");
+    }
+  });
+
   // Sidebar Toggle
   const toggleBtn = document.getElementById("toggle-btn");
   const sidebar = document.getElementById("sidebar");
@@ -8,6 +24,7 @@ $(document).ready(function () {
       sidebar.classList.toggle("collapsed");
     });
   }
+
   // --------------------------------
   // Colleges Page
   // --------------------------------
@@ -18,8 +35,8 @@ $(document).ready(function () {
       ordering: true,
       paging: true,
       columnDefs: [{ orderable: false, searchable: false, targets: 2 }],
-      pageLength: 15,
-      lengthMenu: [15, 25, 50],
+      pageLength: 10,
+      lengthMenu: [10, 25, 50],
     });
 
     // Edit College
@@ -51,8 +68,8 @@ $(document).ready(function () {
       ordering: true,
       paging: true,
       columnDefs: [{ orderable: false, searchable: false, targets: 3 }],
-      pageLength: 15,
-      lengthMenu: [15, 25, 50],
+      pageLength: 10,
+      lengthMenu: [10, 25, 50],
     });
 
     // Edit Program
@@ -90,8 +107,8 @@ $(document).ready(function () {
       searching: true,
       ordering: true,
       paging: true,
-      pageLength: 15,
-      lengthMenu: [15, 25, 50],
+      pageLength: 10,
+      lengthMenu: [10, 25, 50],
       columnDefs: [
         { orderable: false, searchable: false, targets: 6 },
         { className: "dt-head-center dt-body-left", targets: 4 },

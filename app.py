@@ -42,5 +42,17 @@ def students():
     ]
     return render_template("students.html", students=students)
 
+@app.route("/login")
+def login():
+    return render_template("login.html")
+
+@app.route("/register")
+def register():
+    return render_template("register.html")
+
+@app.route("/users")
+def users():
+    return render_template("users.html")
+
 if __name__ == "__main__":
     app.run(debug=True)
