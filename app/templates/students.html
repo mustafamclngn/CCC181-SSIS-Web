@@ -16,7 +16,7 @@
   </div>
 
   <!-- students datatable -->
-  <table id="studentsTable" class="table table-bordered">
+  <table id="data-table" class="table table-bordered">
     <thead>
       <tr>
         <th scope="col">ID-number</th>
@@ -70,8 +70,8 @@
             data-bs-dismiss="modal"
           ></button>
         </div>
-        <div class="modal-body">
-          <form id="registerStudentForm">
+        <form id="registerStudentForm">
+          <div class="modal-body">
             <div class="mb-3">
               <label for="idNumber" class="form-label">ID Number:</label>
               <input
@@ -123,20 +123,16 @@
                 <option value="Female">Female</option>
               </select>
             </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" data-bs-dismiss="modal">
-            Close
-          </button>
-          <button
-            type="submit"
-            form="registerStudentForm"
-            class="btn btn-success"
-          >
-            <i class="bi bi-plus-lg"></i> Register
-          </button>
-        </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" data-bs-dismiss="modal">
+              Close
+            </button>
+            <button type="submit" class="btn btn-success">
+              <i class="bi bi-plus-lg"></i> Register
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
