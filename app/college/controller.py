@@ -21,7 +21,6 @@ def colleges():
 # ========= REGISTER COLLEGE =========
 # ========= REGISTER COLLEGE =========
 # ========= REGISTER COLLEGE =========
-
 @college_bp.route("/colleges/register", methods=["POST"])
 def register_college():
     code = request.form.get("code", "").strip().upper()
@@ -34,13 +33,16 @@ def register_college():
     db = get_db()
     cursor = db.cursor()
     try:
-        cursor.execute("INSERT INTO colleges (collegecode, collegename) VALUES (%s, %s)", (code, name))
+        cursor.execute(
+            "INSERT INTO colleges (collegecode, collegename) VALUES (%s, %s)",
+            (code, name),
+        )
         db.commit()
         flash("College registered successfully!", "success")
     except Exception as e:
         db.rollback()
-        flash(f"Error registering college: {str(e)}", "danger")
-        print(f"DEBUG: Exception: {e}")
+        flash(f"Error registering college: {e}", "danger")
+        print(f"DEBUG: Exception registering college: {e}")
     finally:
         cursor.close()
 
@@ -62,13 +64,12 @@ def delete_college():
     cursor = db.cursor()
     try:
         cursor.execute("DELETE FROM colleges WHERE collegecode = %s", (code,))
-
         db.commit()
-        flash(f"College {code} and its related programs/students deleted.", "success")
+        flash(f"College {code} deleted successfully.", "success")
     except Exception as e:
         db.rollback()
-        flash(f"Error deleting college: {str(e)}", "danger")
-        print(f"DEBUG: Exception while deleting college: {e}")
+        flash(f"Error deleting college: {e}", "danger")
+        print(f"DEBUG: Exception deleting college: {e}")
     finally:
         cursor.close()
 
@@ -77,7 +78,6 @@ def delete_college():
 # ========= EDIT COLLEGE =========
 # ========= EDIT COLLEGE =========
 # ========= EDIT COLLEGE =========
-
 @college_bp.route("/colleges/edit", methods=["POST"])
 def edit_college():
     original_code = request.form.get("original_code", "").strip().upper()
@@ -97,14 +97,14 @@ def edit_college():
             SET collegecode = %s, collegename = %s
             WHERE collegecode = %s
             """,
-            (new_code, new_name, original_code)
+            (new_code, new_name, original_code),
         )
         db.commit()
         flash("College updated successfully!", "success")
     except Exception as e:
         db.rollback()
-        flash(f"Error updating college: {str(e)}", "danger")
-        print(f"DEBUG: Exception: {e}")
+        flash(f"Error updating college: {e}", "danger")
+        print(f"DEBUG: Exception updating college: {e}")
     finally:
         cursor.close()
 
