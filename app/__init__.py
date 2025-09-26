@@ -8,6 +8,7 @@ from flask import Flask, render_template, url_for, request, redirect, session
 from app.database import get_db, close_db
 
 from app.college import college_bp
+from app.program import program_bp
 load_dotenv()
 
 def create_app():
@@ -15,16 +16,17 @@ def create_app():
     app.config["SECRET_KEY"] = config.SECRET_KEY
     app.config["DATABASE_URL"] = config.DATABASE_URL
     app.register_blueprint(college_bp)
+    app.register_blueprint(program_bp)
 
     @app.route("/")
-    @app.route("/dasboard")
+    @app.route("/dashboard")
     def dashboard():
         return render_template("dashboard.html")
 
-    @app.route("/programs")
-    def programs():
-        programs = []
-        return render_template("programs.html", programs=programs)
+    # @app.route("/programs")
+    # def programs():
+    #     programs = []
+    #     return render_template("programs.html", programs=programs)
 
     @app.route("/students")
     def students():
