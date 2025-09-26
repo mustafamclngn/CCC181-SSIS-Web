@@ -72,48 +72,34 @@ $(document).ready(function () {
     $("#editCollegeModal").modal("show");
   });
 
-  $(document).ready(function () {
-    $("#editForm").on("submit", function (e) {
-      e.preventDefault();
+  $("#editForm").on("submit", function (e) {
+    e.preventDefault();
 
-      const originalCode = $("#originalCollegeCode").val().trim().toUpperCase();
-      const code = $("#editCollegeCode").val().trim().toUpperCase();
-      const name = $("#editCollegeName").val().trim();
+    const originalCode = $("#originalCollegeCode").val().trim().toUpperCase();
+    const code = $("#editCollegeCode").val().trim().toUpperCase();
+    const name = $("#editCollegeName").val().trim();
 
-      if (!code || !name) {
-        alert("All fields are required.");
-        return;
-      }
+    if (!code || !name) {
+      alert("All fields are required.");
+      return;
+    }
 
-      $.ajax({
-        url: "/colleges/edit",
-        type: "POST",
-        data: {
-          original_code: originalCode,
-          code: code,
-          name: name,
-        },
-        success: function (response) {
-          $("#editCollegeModal").modal("hide");
-          location.reload();
-        },
-        error: function (xhr, status, error) {
-          console.error("Error:", error);
-          alert("An error occurred while updating the college.");
-        },
-      });
-    });
-
-    $(".btn-edit").click(function (e) {
-      e.preventDefault();
-      const row = $(this).closest("tr");
-      const code = row.find("td:eq(0)").text().trim();
-      const name = row.find("td:eq(1)").text().trim();
-
-      $("#originalCollegeCode").val(code);
-      $("#editCollegeCode").val(code);
-      $("#editCollegeName").val(name);
-      $("#editCollegeModal").modal("show");
+    $.ajax({
+      url: "/colleges/edit",
+      type: "POST",
+      data: {
+        original_code: originalCode,
+        code: code,
+        name: name,
+      },
+      success: function () {
+        $("#editCollegeModal").modal("hide");
+        location.reload();
+      },
+      error: function (xhr, status, error) {
+        console.error("Error:", error);
+        alert("An error occurred while updating the college.");
+      },
     });
   });
 
@@ -150,38 +136,124 @@ $(document).ready(function () {
     });
   });
 
-  // --------------------------------
-  // Programs Page
-  // --------------------------------
+  // ================================
+  // PROGRAMS PAGE
+  // ================================
+
+  // Register Program
+  $("#registerProgramForm").on("submit", function (e) {
+    e.preventDefault();
+
+    let code = $("#programCode").val().trim().toUpperCase();
+    let name = $("#programName").val().trim();
+    let collegeCode = $("#programCollege").val();
+
+    if (!code || !name || !collegeCode) {
+      alert("All fields are required.");
+      return;
+    }
+
+    $.ajax({
+      url: "/programs/register",
+      type: "POST",
+      data: {
+        code: code,
+        name: name,
+        college_code: collegeCode,
+      },
+      success: function () {
+        $("#registerProgramModal").modal("hide");
+        location.reload();
+      },
+      error: function (xhr, status, error) {
+        console.error("Error:", error);
+        alert("An error occurred while registering the program.");
+      },
+    });
+  });
 
   // Edit Program
   $(".btn-edit").click(function (e) {
     e.preventDefault();
     const row = $(this).closest("tr");
-    const code = row.find("td:eq(0)").text();
-    const name = row.find("td:eq(1)").text();
-    const college = row.find("td:eq(2)").text();
+    const code = row.find("td:eq(0)").text().trim();
+    const name = row.find("td:eq(1)").text().trim();
+    const college_code = row.find("td:eq(2)").text().trim();
 
+    $("#editOriginalProgramCode").val(code);
     $("#editProgramCode").val(code);
     $("#editProgramName").val(name);
-    $("#editProgramCollege option")
-      .filter(function () {
-        return $(this).text() === college;
-      })
-      .prop("selected", true);
+
+    $("#editProgramCollege").val(college_code);
 
     $("#editProgramModal").modal("show");
+  });
+
+  $("#editProgramForm").on("submit", function (e) {
+    e.preventDefault();
+
+    const original_code = $("#editOriginalProgramCode").val().trim();
+    const code = $("#editProgramCode").val().trim().toUpperCase();
+    const name = $("#editProgramName").val().trim();
+    const college_code = $("#editProgramCollege").val();
+
+    if (!code || !name || !college_code) {
+      alert("All fields are required.");
+      return;
+    }
+
+    $.ajax({
+      url: "/programs/edit",
+      type: "POST",
+      data: { original_code, code, name, college_code },
+      success: function () {
+        $("#editProgramModal").modal("hide");
+        location.reload();
+      },
+      error: function (xhr, status, error) {
+        console.error("Error:", error);
+        alert("An error occurred while updating the program.");
+      },
+    });
   });
 
   // Delete Program
   $(".btn-delete").click(function (e) {
     e.preventDefault();
+    const row = $(this).closest("tr");
+    const code = row.find("td:eq(0)").text().trim();
+
+    $("#deleteProgramCode").val(code);
+
     $("#deleteProgramModal").modal("show");
   });
 
-  // --------------------------------
-  // Students Page
-  // --------------------------------
+  $("#confirmDeleteProgramBtn").click(function () {
+    const code = $("#deleteProgramCode").val();
+
+    if (!code) {
+      alert("Program code is missing.");
+      return;
+    }
+
+    $.ajax({
+      url: "/programs/delete",
+      type: "POST",
+      data: { code: code },
+      success: function () {
+        $("#deleteProgramModal").modal("hide");
+        location.reload();
+      },
+      error: function (xhr, status, error) {
+        console.error("Error:", error);
+        alert("An error occurred while deleting the program.");
+      },
+    });
+  });
+
+  // ================================
+  // STUDENTS PAGE
+  // ================================
 
   // Edit Student
   $(".btn-edit").click(function (e) {
