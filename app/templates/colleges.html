@@ -112,7 +112,11 @@
   >
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
-        <form id="editForm">
+        <form
+          id="editForm"
+          method="post"
+          action="{{ url_for('college.edit_college') }}"
+        >
           <div class="modal-header">
             <h5 class="modal-title" id="editModalLabel">Edit College</h5>
             <button
