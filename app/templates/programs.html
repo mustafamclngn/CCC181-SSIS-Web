@@ -93,7 +93,9 @@
               />
             </div>
             <div class="mb-3">
-              <label for="programCollege" class="form-label">College:</label>
+              <label for="programCollege" class="form-label"
+                >College Code:</label
+              >
               <select
                 class="form-select"
                 id="programCollege"
@@ -101,9 +103,7 @@
                 required
               >
                 {% for college in colleges %}
-                <option value="{{ college.code }}">
-                  {{ college.code }} – {{ college.name }}
-                </option>
+                <option value="{{ college.code }}">{{ college.code }}</option>
                 {% endfor %}
               </select>
             </div>
@@ -187,7 +187,7 @@
 
             <div class="mb-3">
               <label for="editProgramCollege" class="form-label"
-                >College:</label
+                >College Code:</label
               >
               <select
                 class="form-select"
@@ -196,9 +196,7 @@
                 required
               >
                 {% for college in colleges %}
-                <option value="{{ college.code }}">
-                  {{ college.code }} – {{ college.name }}
-                </option>
+                <option value="{{ college.code }}">{{ college.code }}</option>
                 {% endfor %}
               </select>
             </div>
@@ -212,8 +210,8 @@
             >
               Close
             </button>
-            <button type="submit" class="btn btn-success">
-              <i class="bi bi-check-lg"></i> Save Changes
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-save"></i> Save Changes
             </button>
           </div>
         </form>
@@ -272,7 +270,11 @@
             >
               <i class="bi bi-x-lg"></i> Cancel
             </button>
-            <button type="submit" class="btn btn-danger">
+            <button
+              type="button"
+              id="confirmDeleteProgramBtn"
+              class="btn btn-danger"
+            >
               <i class="bi bi-trash"></i> Delete
             </button>
           </div>
