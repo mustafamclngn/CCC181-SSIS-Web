@@ -9,29 +9,23 @@ from app.database import get_db, close_db
 
 from app.college import college_bp
 from app.program import program_bp
+from app.student import student_bp
+
 load_dotenv()
 
 def create_app():
     app = Flask(__name__)
     app.config["SECRET_KEY"] = config.SECRET_KEY
     app.config["DATABASE_URL"] = config.DATABASE_URL
+    
     app.register_blueprint(college_bp)
     app.register_blueprint(program_bp)
+    app.register_blueprint(student_bp) 
 
     @app.route("/")
     @app.route("/dashboard")
     def dashboard():
         return render_template("dashboard.html")
-
-    # @app.route("/programs")
-    # def programs():
-    #     programs = []
-    #     return render_template("programs.html", programs=programs)
-
-    @app.route("/students")
-    def students():
-        students = []
-        return render_template("students.html", students=students)
 
     @app.route("/login")
     def login():
