@@ -6,7 +6,6 @@ program_bp = Blueprint("program", __name__, template_folder="templates")
 @program_bp.route("/programs")
 def programs():
     db = get_db()
-
     cursor = db.cursor()
     cursor.execute("SELECT collegecode, collegename FROM colleges ORDER BY collegecode ASC")
     colleges_data = cursor.fetchall()
@@ -48,7 +47,7 @@ def register_program():
             (program_code, program_name, college_code)
         )
         db.commit()
-        return {"success": True, "message": f"Program {program_name} registered successfully!"}
+        return {"success": True,}
     except Exception as e:
         db.rollback()
         return {"success": False, "message": str(e)}, 500
@@ -84,7 +83,7 @@ def edit_program():
             (new_code, new_name, new_college_code, original_code)
         )
         db.commit()
-        return {"success": True, "message": f"Program {new_code} updated successfully!"}
+        return {"success": True, "message": f"Program updated successfully!"}
     except Exception as e:
         db.rollback()
         return {"success": False, "message": str(e)}, 500
@@ -100,20 +99,16 @@ def delete_program():
     code = request.form.get("code", "").strip().upper()
 
     if not code:
-        flash("Program code is missing!", "danger")
-        return redirect(url_for("program.programs"))
+        return {"success": False, "message": "Program code is missing!"}, 400
 
     db = get_db()
     cursor = db.cursor()
     try:
         cursor.execute("DELETE FROM programs WHERE programcode = %s", (code,))
         db.commit()
-        flash(f"Program {code} deleted successfully.", "success")
+        return {"success": True, "message": f"Program deleted successfully."}
     except Exception as e:
         db.rollback()
-        flash(f"Error deleting program: {e}", "danger")
-        print(f"DEBUG: Exception deleting program: {e}")
+        return {"success": False, "message": str(e)}, 500
     finally:
         cursor.close()
-
-    return redirect(url_for("program.programs"))
