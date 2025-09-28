@@ -31,7 +31,7 @@
     <tbody>
       {% for student in students %}
       <tr>
-        <td>{{ student.idnumber }}</td>
+        <td>{{ student.id_number }}</td>
         <td>{{ student.first_name }}</td>
         <td>{{ student.last_name }}</td>
         <td>{{ student.program_code }}</td>
@@ -70,7 +70,11 @@
             data-bs-dismiss="modal"
           ></button>
         </div>
-        <form id="registerStudentForm">
+        <form
+          id="registerStudentForm"
+          method="post"
+          action="{{ url_for('student.register_student') }}"
+        >
           <div class="modal-body">
             <div class="mb-3">
               <label for="idNumber" class="form-label">ID Number:</label>
@@ -78,7 +82,9 @@
                 type="text"
                 class="form-control"
                 id="idNumber"
+                name="id_number"
                 placeholder="e.g. 2020-00001"
+                required
               />
             </div>
             <div class="mb-3">
@@ -87,7 +93,9 @@
                 type="text"
                 class="form-control"
                 id="firstName"
+                name="first_name"
                 placeholder="Enter first name"
+                required
               />
             </div>
             <div class="mb-3">
@@ -96,12 +104,19 @@
                 type="text"
                 class="form-control"
                 id="lastName"
+                name="last_name"
                 placeholder="Enter last name"
+                required
               />
             </div>
             <div class="mb-3">
               <label for="programCode" class="form-label">Program:</label>
-              <select class="form-select" id="programCode">
+              <select
+                class="form-select"
+                id="programCode"
+                name="program_code"
+                required
+              >
                 {% for program in programs %}
                 <option value="{{ program.code }}">{{ program.name }}</option>
                 {% endfor %}
@@ -109,7 +124,12 @@
             </div>
             <div class="mb-3">
               <label for="yearLevel" class="form-label">Year Level:</label>
-              <select class="form-select" id="yearLevel">
+              <select
+                class="form-select"
+                id="yearLevel"
+                name="year_level"
+                required
+              >
                 <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
@@ -118,7 +138,7 @@
             </div>
             <div class="mb-3">
               <label for="gender" class="form-label">Gender:</label>
-              <select class="form-select" id="gender">
+              <select class="form-select" id="gender" name="gender" required>
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
               </select>
