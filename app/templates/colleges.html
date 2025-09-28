@@ -90,7 +90,11 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button class="btn btn-secondary" data-bs-dismiss="modal">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
               Close
             </button>
             <button type="submit" class="btn btn-success">
@@ -140,6 +144,7 @@
                 class="form-control"
                 id="editCollegeCode"
                 name="code"
+                required
               />
             </div>
             <div class="mb-3">
@@ -151,15 +156,20 @@
                 class="form-control"
                 id="editCollegeName"
                 name="name"
+                required
               />
             </div>
           </div>
           <div class="modal-footer">
-            <button class="btn btn-secondary" data-bs-dismiss="modal">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
               Close
             </button>
-            <button type="submit" class="btn btn-success">
-              <i class="bi bi-check-lg"></i> Save Changes
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-save"></i> Save Changes
             </button>
           </div>
         </form>
@@ -217,7 +227,7 @@
             >
               <i class="bi bi-x-lg"></i> Cancel
             </button>
-            <button type="submit" class="btn btn-danger">
+            <button type="button" id="confirmDeleteBtn" class="btn btn-danger">
               <i class="bi bi-trash"></i> Delete
             </button>
           </div>
