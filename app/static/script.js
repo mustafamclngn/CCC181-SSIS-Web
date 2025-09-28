@@ -32,75 +32,77 @@ $(document).ready(function () {
   // ================================
 
   // Register College
-  $("#registerCollegeForm").on("submit", function (e) {
+  $("#registerCollegeForm").submit(function (e) {
     e.preventDefault();
 
-    let code = $("#collegeCode").val().trim().toUpperCase();
-    let name = $("#collegeName").val().trim();
+    const form = $(this);
+    const url = form.attr("action");
+    const code = $("#collegeCode").val().trim().toUpperCase();
+    const name = $("#collegeName").val().trim();
 
     if (!code || !name) {
-      alert("All fields are required.");
+      alert("Please fill in both College Code and College Name.");
       return;
     }
 
-    $.ajax({
-      url: "/colleges/register",
-      type: "POST",
-      data: { code: code, name: name },
-      success: function () {
-        $("#registerCollegeModal").modal("hide");
-        location.reload();
-      },
-      error: function (xhr, status, error) {
-        console.error("Error:", error);
-        alert("An error occurred while registering the college.");
-      },
-    });
+    const data = { code: code, name: name };
+
+    $.post(url, data)
+      .done(function (response) {
+        if (response.success) {
+          alert(response.message);
+          $("#registerCollegeModal").modal("hide");
+          location.reload();
+        } else {
+          alert("Error: " + response.message);
+        }
+      })
+      .fail(function (xhr) {
+        const errMsg = xhr.responseJSON
+          ? xhr.responseJSON.message
+          : xhr.statusText;
+        alert("Request failed: " + errMsg);
+      });
   });
 
   // Edit College
   $(".btn-edit").click(function (e) {
     e.preventDefault();
-    const row = $(this).closest("tr");
-    const code = row.find("td:eq(0)").text().trim();
-    const name = row.find("td:eq(1)").text().trim();
 
-    $("#originalCollegeCode").val(code);
-    $("#editCollegeCode").val(code);
-    $("#editCollegeName").val(name);
+    const row = $(this).closest("tr");
+
+    const collegeCode = row.find("td:eq(0)").text().trim();
+    const collegeName = row.find("td:eq(1)").text().trim();
+
+    $("#originalCollegeCode").val(collegeCode);
+    $("#editCollegeCode").val(collegeCode);
+    $("#editCollegeName").val(collegeName);
 
     $("#editCollegeModal").modal("show");
   });
 
-  $("#editForm").on("submit", function (e) {
+  $("#editForm").submit(function (e) {
     e.preventDefault();
 
-    const originalCode = $("#originalCollegeCode").val().trim().toUpperCase();
-    const code = $("#editCollegeCode").val().trim().toUpperCase();
-    const name = $("#editCollegeName").val().trim();
+    const form = $(this);
+    const url = form.attr("action");
+    const data = form.serialize();
 
-    if (!code || !name) {
-      alert("All fields are required.");
-      return;
-    }
-
-    $.ajax({
-      url: "/colleges/edit",
-      type: "POST",
-      data: {
-        original_code: originalCode,
-        code: code,
-        name: name,
-      },
-      success: function () {
-        $("#editCollegeModal").modal("hide");
-        location.reload();
-      },
-      error: function (xhr, status, error) {
-        console.error("Error:", error);
-        alert("An error occurred while updating the college.");
-      },
-    });
+    $.post(url, data)
+      .done(function (response) {
+        if (response.success) {
+          alert(response.message);
+          location.reload();
+        } else {
+          alert("Error: " + response.message);
+        }
+      })
+      .fail(function (xhr) {
+        const errMsg = xhr.responseJSON
+          ? xhr.responseJSON.message
+          : xhr.statusText;
+        alert("Request failed: " + errMsg);
+      });
   });
 
   // Delete College
@@ -117,174 +119,278 @@ $(document).ready(function () {
     const code = $("#deleteCollegeCode").val();
 
     if (!code) {
-      alert("College code is missing.");
+      alert("No college selected for deletion.");
       return;
     }
 
-    $.ajax({
-      url: "/colleges/delete",
-      type: "POST",
-      data: { code: code },
-      success: function () {
-        $("#deleteCollegeModal").modal("hide");
-        location.reload();
-      },
-      error: function (xhr, status, error) {
-        console.error("Error:", error);
-        alert("An error occurred while deleting the college.");
-      },
-    });
+    $.post("/colleges/delete", { code: code })
+      .done(function (response) {
+        if (response.success) {
+          alert(response.message);
+          $("#deleteCollegeModal").modal("hide");
+          location.reload();
+        } else {
+          alert("Error: " + response.message);
+        }
+      })
+      .fail(function (xhr) {
+        const errMsg = xhr.responseJSON
+          ? xhr.responseJSON.message
+          : xhr.statusText;
+        alert("Request failed: " + errMsg);
+      });
   });
 
   // ================================
-  // PROGRAMS PAGE
+  // PROGRAM PAGE
   // ================================
 
   // Register Program
-  $("#registerProgramForm").on("submit", function (e) {
+  $("#registerProgramForm").submit(function (e) {
     e.preventDefault();
 
-    let code = $("#programCode").val().trim().toUpperCase();
-    let name = $("#programName").val().trim();
-    let collegeCode = $("#programCollege").val();
+    const form = $(this);
+    const url = form.attr("action") || "/programs/register";
+    const code = $("#programCode").val().trim().toUpperCase();
+    const name = $("#programName").val().trim();
+    const college_code = $("#programCollege").val().trim().toUpperCase();
 
-    if (!code || !name || !collegeCode) {
-      alert("All fields are required.");
+    if (!code || !name || !college_code) {
+      alert("Please fill in all fields.");
       return;
     }
 
-    $.ajax({
-      url: "/programs/register",
-      type: "POST",
-      data: {
-        code: code,
-        name: name,
-        college_code: collegeCode,
-      },
-      success: function () {
-        $("#registerProgramModal").modal("hide");
-        location.reload();
-      },
-      error: function (xhr, status, error) {
-        console.error("Error:", error);
-        alert("An error occurred while registering the program.");
-      },
-    });
+    const data = { code: code, name: name, college_code: college_code };
+
+    $.post(url, data)
+      .done(function (response) {
+        if (response.success) {
+          alert(response.message);
+          $("#registerProgramModal").modal("hide");
+          location.reload();
+        } else {
+          alert("Error: " + response.message);
+        }
+      })
+      .fail(function (xhr) {
+        const errMsg = xhr.responseJSON
+          ? xhr.responseJSON.message
+          : xhr.statusText;
+        alert("Request failed: " + errMsg);
+      });
   });
 
   // Edit Program
   $(".btn-edit").click(function (e) {
     e.preventDefault();
+
     const row = $(this).closest("tr");
-    const code = row.find("td:eq(0)").text().trim();
-    const name = row.find("td:eq(1)").text().trim();
-    const college_code = row.find("td:eq(2)").text().trim();
 
-    $("#editOriginalProgramCode").val(code);
-    $("#editProgramCode").val(code);
-    $("#editProgramName").val(name);
+    const programCode = row.find("td:eq(0)").text().trim();
+    const programName = row.find("td:eq(1)").text().trim();
+    const collegeCode = row.find("td:eq(2)").text().trim();
 
-    $("#editProgramCollege").val(college_code);
+    $("#editOriginalProgramCode").val(programCode);
+    $("#editProgramCode").val(programCode);
+    $("#editProgramName").val(programName);
+    $("#editProgramCollege").val(collegeCode);
 
     $("#editProgramModal").modal("show");
   });
 
-  $("#editProgramForm").on("submit", function (e) {
+  $("#editProgramForm").submit(function (e) {
     e.preventDefault();
 
-    const original_code = $("#editOriginalProgramCode").val().trim();
-    const code = $("#editProgramCode").val().trim().toUpperCase();
-    const name = $("#editProgramName").val().trim();
-    const college_code = $("#editProgramCollege").val();
+    const form = $(this);
+    const url = form.attr("action");
+    const data = form.serialize();
 
-    if (!code || !name || !college_code) {
-      alert("All fields are required.");
-      return;
-    }
-
-    $.ajax({
-      url: "/programs/edit",
-      type: "POST",
-      data: { original_code, code, name, college_code },
-      success: function () {
-        $("#editProgramModal").modal("hide");
-        location.reload();
-      },
-      error: function (xhr, status, error) {
-        console.error("Error:", error);
-        alert("An error occurred while updating the program.");
-      },
-    });
+    $.post(url, data)
+      .done(function (response) {
+        if (response.success) {
+          alert(response.message);
+          location.reload();
+        } else {
+          alert("Error: " + response.message);
+        }
+      })
+      .fail(function (xhr) {
+        alert("Request failed: " + xhr.responseJSON.message);
+      });
   });
 
   // Delete Program
   $(".btn-delete").click(function (e) {
     e.preventDefault();
     const row = $(this).closest("tr");
-    const code = row.find("td:eq(0)").text().trim();
+    const studentId = row.find("td:eq(0)").text().trim();
 
-    $("#deleteProgramCode").val(code);
-
-    $("#deleteProgramModal").modal("show");
+    $("#deleteStudentId").val(studentId);
+    $("#deleteStudentModal").modal("show");
   });
 
-  $("#confirmDeleteProgramBtn").click(function () {
-    const code = $("#deleteProgramCode").val();
+  $("#confirmDeleteStudentBtn").click(function () {
+    const studentId = $("#deleteStudentId").val();
 
-    if (!code) {
-      alert("Program code is missing.");
+    if (!studentId) {
+      alert("No student selected for deletion.");
       return;
     }
 
-    $.ajax({
-      url: "/programs/delete",
-      type: "POST",
-      data: { code: code },
-      success: function () {
-        $("#deleteProgramModal").modal("hide");
-        location.reload();
-      },
-      error: function (xhr, status, error) {
-        console.error("Error:", error);
-        alert("An error occurred while deleting the program.");
-      },
-    });
+    $.post("/students/delete", { id_number: studentId })
+      .done(function (response) {
+        if (response.success) {
+          alert(response.message);
+          $("#deleteStudentModal").modal("hide");
+          location.reload();
+        } else {
+          alert("Error: " + response.message);
+        }
+      })
+      .fail(function (xhr) {
+        const errMsg = xhr.responseJSON
+          ? xhr.responseJSON.message
+          : xhr.statusText;
+        alert("Request failed: " + errMsg);
+      });
   });
 
   // ================================
   // STUDENTS PAGE
   // ================================
 
+  // Register Student
+  $("#registerStudentForm").submit(function (e) {
+    e.preventDefault();
+
+    const idNumber = $("#idNumber").val().trim();
+    const firstName = $("#firstName").val().trim();
+    const lastName = $("#lastName").val().trim();
+    const programCode = $("#programCode").val().trim();
+    const yearLevel = $("#yearLevel").val().trim();
+    const gender = $("#gender").val().trim();
+
+    if (
+      !idNumber ||
+      !firstName ||
+      !lastName ||
+      !programCode ||
+      !yearLevel ||
+      !gender
+    ) {
+      alert("All fields are required.");
+      return;
+    }
+
+    const data = {
+      id_number: idNumber,
+      first_name: firstName,
+      last_name: lastName,
+      program_code: programCode,
+      year_level: yearLevel,
+      gender: gender,
+    };
+
+    const url = $(this).attr("action") || "/students/register";
+
+    $.post(url, data)
+      .done(function (response) {
+        if (response.success) {
+          alert(response.message);
+          $("#registerStudentModal").modal("hide");
+          location.reload();
+        } else {
+          alert("Error: " + response.message);
+        }
+      })
+      .fail(function (xhr) {
+        const errMsg = xhr.responseJSON
+          ? xhr.responseJSON.message
+          : xhr.statusText;
+        alert("Request failed: " + errMsg);
+      });
+  });
+
   // Edit Student
   $(".btn-edit").click(function (e) {
     e.preventDefault();
+
     const row = $(this).closest("tr");
-    const idnumber = row.find("td:eq(0)").text();
-    const firstName = row.find("td:eq(1)").text();
-    const lastName = row.find("td:eq(2)").text();
+
+    const idNumber = row.find("td:eq(0)").text().trim();
+    const firstName = row.find("td:eq(1)").text().trim();
+    const lastName = row.find("td:eq(2)").text().trim();
     const programCode = row.find("td:eq(3)").text().trim();
-    const yearLevel = row.find("td:eq(4)").text().trim();
-    const gender = row.find("td:eq(5)").text().trim();
 
-    $("#editIdNumber").val(idnumber);
-    $("#editFirstName").val(firstName);
-    $("#editLastName").val(lastName);
+    $("#originalStudentId").val(idNumber);
+    $("#originalStudentProgram").val(programCode);
+    $("#studentIdInput").val(idNumber);
+    $("#studentFirstNameInput").val(firstName);
+    $("#studentLastNameInput").val(lastName);
 
-    $("#editProgramCode option")
-      .filter(function () {
-        return $(this).val() === programCode;
-      })
-      .prop("selected", true);
-
-    $("#editYearLevel").val(yearLevel);
-    $("#editGender").val(gender);
+    $("#studentProgramSelect").val(programCode);
 
     $("#editStudentModal").modal("show");
   });
 
-  // Delete Student
+  $("#editStudentForm").submit(function (e) {
+    e.preventDefault();
+
+    const form = $(this);
+    const url = form.attr("action");
+    const data = form.serialize();
+
+    $.post(url, data)
+      .done(function (response) {
+        if (response.success) {
+          alert(response.message);
+          location.reload();
+        } else {
+          alert("Error: " + response.message);
+        }
+      })
+      .fail(function (xhr) {
+        let res = xhr.responseJSON;
+        alert("Request failed: " + (res ? res.message : xhr.responseText));
+      });
+  });
+
   $(".btn-delete").click(function (e) {
     e.preventDefault();
+    const row = $(this).closest("tr");
+
+    const studentId = row.find("td:eq(0)").text().trim();
+
+    if (!studentId) {
+      alert("Unable to get student ID. Please check your table structure.");
+      return;
+    }
+
+    $("#confirmDeleteBtn").data("student-id", studentId);
+
     $("#deleteStudentModal").modal("show");
+  });
+
+  $("#confirmDeleteBtn").click(function () {
+    const studentId = $(this).data("student-id");
+
+    if (!studentId) {
+      alert("No student ID found. Cannot delete.");
+      return;
+    }
+
+    $.post("/students/delete", { id_number: studentId })
+      .done(function (response) {
+        if (response.success) {
+          alert(response.message);
+          location.reload();
+        } else {
+          alert("Error: " + response.message);
+        }
+      })
+      .fail(function (xhr) {
+        const res = xhr.responseJSON;
+        alert("Request failed: " + (res ? res.message : xhr.responseText));
+      });
   });
 });
