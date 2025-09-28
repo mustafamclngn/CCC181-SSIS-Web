@@ -21,15 +21,15 @@ def colleges():
 # ========= REGISTER COLLEGE =========
 # ========= REGISTER COLLEGE =========
 # ========= REGISTER COLLEGE =========
+
 @college_bp.route("/colleges/register", methods=["POST"])
 def register_college():
     code = request.form.get("code", "").strip().upper()
     name = request.form.get("name", "").strip().title()
 
     if not code or not name:
-        flash("All fields are required.", "danger")
-        return redirect(url_for("college.colleges"))
-
+        return {"success": False, "message": "All fields are required."}, 400
+    
     db = get_db()
     cursor = db.cursor()
     try:
@@ -38,46 +38,17 @@ def register_college():
             (code, name),
         )
         db.commit()
-        flash("College registered successfully!", "success")
+        return {"success": True,}
     except Exception as e:
         db.rollback()
-        flash(f"Error registering college: {e}", "danger")
-        print(f"DEBUG: Exception registering college: {e}")
+        return {"success": False, "message": str(e)}, 500
     finally:
         cursor.close()
 
-    return redirect(url_for("college.colleges"))
-
-# ========= DELETE COLLEGE =========
-# ========= DELETE COLLEGE =========
-# ========= DELETE COLLEGE =========
-
-@college_bp.route("/colleges/delete", methods=["POST"])
-def delete_college():
-    code = request.form.get("code", "").strip().upper()
-
-    if not code:
-        flash("College code is missing!", "danger")
-        return redirect(url_for("college.colleges"))
-
-    db = get_db()
-    cursor = db.cursor()
-    try:
-        cursor.execute("DELETE FROM colleges WHERE collegecode = %s", (code,))
-        db.commit()
-        flash(f"College {code} deleted successfully.", "success")
-    except Exception as e:
-        db.rollback()
-        flash(f"Error deleting college: {e}", "danger")
-        print(f"DEBUG: Exception deleting college: {e}")
-    finally:
-        cursor.close()
-
-    return redirect(url_for("college.colleges"))
-
 # ========= EDIT COLLEGE =========
 # ========= EDIT COLLEGE =========
 # ========= EDIT COLLEGE =========
+
 @college_bp.route("/colleges/edit", methods=["POST"])
 def edit_college():
     original_code = request.form.get("original_code", "").strip().upper()
@@ -85,8 +56,7 @@ def edit_college():
     new_name = request.form.get("name", "").strip().title()
 
     if not original_code or not new_code or not new_name:
-        flash("All fields are required.", "danger")
-        return redirect(url_for("college.colleges"))
+        return {"success": False, "message": "All fields are required."}, 400
 
     db = get_db()
     cursor = db.cursor()
@@ -100,12 +70,32 @@ def edit_college():
             (new_code, new_name, original_code),
         )
         db.commit()
-        flash("College updated successfully!", "success")
+        return {"success": True, "message": f"College updated successfully!"}
     except Exception as e:
         db.rollback()
-        flash(f"Error updating college: {e}", "danger")
-        print(f"DEBUG: Exception updating college: {e}")
+        return {"success": False, "message": str(e)}, 500
     finally:
         cursor.close()
 
-    return redirect(url_for("college.colleges"))
+# ========= DELETE COLLEGE =========
+# ========= DELETE COLLEGE =========
+# ========= DELETE COLLEGE =========
+
+@college_bp.route("/colleges/delete", methods=["POST"])
+def delete_college():
+    code = request.form.get("code", "").strip().upper()
+
+    if not code:
+        return {"success": False, "message": "College code is missing!"}, 400
+
+    db = get_db()
+    cursor = db.cursor()
+    try:
+        cursor.execute("DELETE FROM colleges WHERE collegecode = %s", (code,))
+        db.commit()
+        return {"success": True, "message": f"College deleted successfully!"}
+    except Exception as e:
+        db.rollback()
+        return {"success": False, "message": str(e)}, 500
+    finally:
+        cursor.close()
