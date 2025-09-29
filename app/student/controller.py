@@ -61,6 +61,13 @@ def register_student():
     db = get_db()
     cursor = db.cursor()
     try:
+        # ✅ Check if student with same ID already exists
+        cursor.execute("SELECT idnumber FROM students WHERE idnumber = %s", (id_number,))
+        existing = cursor.fetchone()
+        if existing:
+            return {"success": False, "message": "Student ID already exists."}, 400
+
+        # If not duplicate, insert
         cursor.execute(
             """
             INSERT INTO students (idnumber, firstname, lastname, gender, yearlevel, programcode)
@@ -69,7 +76,7 @@ def register_student():
             (id_number, first_name, last_name, gender, year_level, program_code)
         )
         db.commit()
-        return {"success": True,}
+        return {"success": True, "message": "Student registered successfully."}
     except Exception as e:
         db.rollback()
         return {"success": False, "message": str(e)}, 500
@@ -96,6 +103,16 @@ def edit_student():
     db = get_db()
     cursor = db.cursor()
     try:
+        # 🔹 Check if new ID already exists (and is not the same as original)
+        cursor.execute(
+            "SELECT idnumber FROM students WHERE idnumber = %s AND idnumber != %s",
+            (id_number, original_id)
+        )
+        duplicate = cursor.fetchone()
+        if duplicate:
+            return {"success": False, "message": "A student with this ID already exists."}, 400
+
+        # 🔹 Proceed with update
         cursor.execute(
             """
             UPDATE students
@@ -110,12 +127,13 @@ def edit_student():
             (id_number, first_name, last_name, gender, year_level, program_code, original_id)
         )
         db.commit()
-        return {"success": True, "message": f"Student updated successfully!"}
+        return {"success": True, "message": "Student updated successfully!"}
     except Exception as e:
         db.rollback()
         return {"success": False, "message": str(e)}, 500
     finally:
         cursor.close()
+
 
 # ========= DELETE STUDENT =========
 # ========= DELETE STUDENT =========
@@ -139,5 +157,3 @@ def delete_student():
         return {"success": False, "message": str(e)}, 500
     finally:
         cursor.close()
-
-

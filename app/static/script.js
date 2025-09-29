@@ -35,12 +35,12 @@ $(document).ready(function () {
   // REGISTER
   // ================================
 
-  // college code restriction
+  // register college code restriction
   $("#collegeCode").on("input", function () {
     this.value = this.value.replace(/[^A-Za-z]/g, "");
   });
 
-  // college name restriction
+  // register college name restriction
   $("#collegeName").on("input", function () {
     this.value = this.value.replace(/[^A-Za-z\s]/g, "");
   });
@@ -52,7 +52,7 @@ $(document).ready(function () {
     }
   });
 
-  // submit validation
+  // register college submit validation
   $("#registerCollegeForm").submit(function (e) {
     e.preventDefault();
 
@@ -103,17 +103,17 @@ $(document).ready(function () {
     $("#editCollegeModal").modal("show");
   });
 
-  // college code restriction
+  // edit college code restriction
   $("#editCollegeCode").on("input", function () {
     this.value = this.value.replace(/[^A-Za-z]/g, "");
   });
 
-  // college name restriction
+  // edit college name restriction
   $("#editCollegeName").on("input", function () {
     this.value = this.value.replace(/[^A-Za-z\s]/g, "");
   });
 
-  // submit validation
+  // edit college submit validation
   $("#editForm").submit(function (e) {
     e.preventDefault();
 
@@ -186,17 +186,16 @@ $(document).ready(function () {
   // REGISTER
   // ================================
 
-  // program code restriction
+  // register program code restriction
   $("#programCode").on("input", function () {
     this.value = this.value.replace(/[^A-Za-z]/g, "");
   });
 
-  // program name restriction
+  // register program name restriction
   $("#programName").on("input", function () {
     this.value = this.value.replace(/[^A-Za-z\s]/g, "");
   });
 
-  // Pre-fill "Bachelor of Science in " when modal opens
   $("#registerProgramModal").on("shown.bs.modal", function () {
     const nameField = $("#programName");
     if (!nameField.val().startsWith("Bachelor of Science in ")) {
@@ -204,6 +203,7 @@ $(document).ready(function () {
     }
   });
 
+  // register program submit validation
   $("#registerProgramForm").submit(function (e) {
     e.preventDefault();
 
@@ -335,7 +335,38 @@ $(document).ready(function () {
   // STUDENTS PAGE
   // ================================
 
-  // Register Student
+  // ================================
+  // REGISTER
+  // ================================
+
+  $("#idNumber").on("input", function () {
+    let value = this.value.toUpperCase();
+
+    // register student idnumber restriction
+    value = value.replace(/[^0-9-]/g, "");
+
+    if (value.length > 4 && value[4] !== "-") {
+      value = value.slice(0, 4) + "-" + value.slice(4);
+    }
+
+    if (value.length > 9) {
+      value = value.slice(0, 9);
+    }
+
+    this.value = value;
+  });
+
+  // register student firstname restriction
+  $("#firstName").on("input", function () {
+    this.value = this.value.replace(/[^A-Za-z\s]/g, "");
+  });
+
+  // register student lastname restriction
+  $("#lastName").on("input", function () {
+    this.value = this.value.replace(/[^A-Za-z\s]/g, "");
+  });
+
+  // register student submit validation
   $("#registerStudentForm").submit(function (e) {
     e.preventDefault();
 
@@ -387,7 +418,10 @@ $(document).ready(function () {
       });
   });
 
-  // Edit Student
+  // ================================
+  // EDIT
+  // ================================
+
   $(".btn-edit").click(function (e) {
     e.preventDefault();
 
@@ -403,14 +437,61 @@ $(document).ready(function () {
     $("#studentIdInput").val(idNumber);
     $("#studentFirstNameInput").val(firstName);
     $("#studentLastNameInput").val(lastName);
-
     $("#studentProgramSelect").val(programCode);
 
     $("#editStudentModal").modal("show");
   });
 
+  // edit student idnumber restriction
+  $("#studentIdInput").on("input", function () {
+    let value = this.value.toUpperCase();
+
+    value = value.replace(/[^0-9-]/g, "");
+
+    if (!value.startsWith("20")) {
+      value = "20";
+    }
+
+    if (value.length > 4 && value[4] !== "-") {
+      value = value.slice(0, 4) + "-" + value.slice(4);
+    }
+
+    if (value.length > 9) {
+      value = value.slice(0, 9);
+    }
+
+    this.value = value;
+  });
+
+  // edit student firstname restriction
+  $("#studentFirstNameInput").on("input", function () {
+    this.value = this.value.replace(/[^A-Za-z\s]/g, "");
+  });
+
+  // edit student lastname restriction
+  $("#studentLastNameInput").on("input", function () {
+    this.value = this.value.replace(/[^A-Za-z\s]/g, "");
+  });
+
+  // edit student submit validation
   $("#editStudentForm").submit(function (e) {
     e.preventDefault();
+
+    const idNumber = $("#studentIdInput").val().trim();
+    const firstName = $("#studentFirstNameInput").val().trim();
+    const lastName = $("#studentLastNameInput").val().trim();
+    const programCode = $("#studentProgramSelect").val().trim();
+
+    const idPattern = /^20\d{2}-\d{4}$/;
+    if (!idPattern.test(idNumber)) {
+      alert("ID Number must follow the format: 20xx-xxxx (e.g., 2023-0001).");
+      return;
+    }
+
+    if (!idNumber || !firstName || !lastName || !programCode) {
+      alert("All fields are required.");
+      return;
+    }
 
     const form = $(this);
     const url = form.attr("action");
@@ -431,6 +512,10 @@ $(document).ready(function () {
       });
   });
 
+  // ================================
+  // DELETE
+  // ================================
+
   $(".btn-delete").click(function (e) {
     e.preventDefault();
     const row = $(this).closest("tr");
@@ -442,12 +527,12 @@ $(document).ready(function () {
       return;
     }
 
-    $("#confirmDeleteBtn").data("student-id", studentId);
+    $("#confirmDeleteStudentBtn").data("student-id", studentId);
 
     $("#deleteStudentModal").modal("show");
   });
 
-  $("#confirmDeleteBtn").click(function () {
+  $("#confirmDeleteStudentBtn").click(function () {
     const studentId = $(this).data("student-id");
 
     if (!studentId) {
@@ -459,6 +544,7 @@ $(document).ready(function () {
       .done(function (response) {
         if (response.success) {
           alert(response.message);
+          $("#deleteStudentModal").modal("hide");
           location.reload();
         } else {
           alert("Error: " + response.message);
