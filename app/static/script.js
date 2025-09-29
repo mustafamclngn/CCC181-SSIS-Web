@@ -31,7 +31,32 @@ $(document).ready(function () {
   // COLLEGE PAGE
   // ================================
 
-  // Register College
+  // ================================
+  // REGISTER
+  // ================================
+
+  // college code restriction
+  $("#collegeCode").on("input", function () {
+    this.value = this.value.replace(/[^A-Za-z]/g, "");
+  });
+
+  // college name restriction
+  $("#collegeName").on("input", function () {
+    if (!this.value.startsWith("College of ")) {
+      this.value = "College of ";
+    }
+    const prefix = "College of ";
+    let suffix = this.value.substring(prefix.length);
+    suffix = suffix.replace(/[^A-Za-z\s]/g, "");
+    this.value = prefix + suffix;
+  });
+
+  $("#registerCollegeModal").on("shown.bs.modal", function () {
+    $("#collegeName").val("College of ");
+    $("#collegeCode").val("");
+  });
+
+  // submit validation
   $("#registerCollegeForm").submit(function (e) {
     e.preventDefault();
 
@@ -45,7 +70,60 @@ $(document).ready(function () {
       return;
     }
 
-    const data = { code: code, name: name };
+    $.post(url, { code: code, name: name })
+      .done(function (response) {
+        if (response.success) {
+          alert(response.message);
+          $("#registerCollegeModal").modal("hide");
+          location.reload();
+        } else {
+          alert("Error: " + response.message);
+        }
+      })
+      .fail(function (xhr) {
+        const errMsg = xhr.responseJSON
+          ? xhr.responseJSON.message
+          : xhr.statusText;
+        alert("Request failed: " + errMsg);
+      });
+  });
+
+  // ================================
+  // EDIT
+  // ================================
+
+  $(".btn-edit").click(function (e) {
+    e.preventDefault();
+
+    const row = $(this).closest("tr");
+
+    const collegeCode = row.find("td:eq(0)").text().trim();
+    const collegeName = row.find("td:eq(1)").text().trim();
+
+    $("#originalCollegeCode").val(collegeCode);
+    $("#editCollegeCode").val(collegeCode);
+    $("#editCollegeName").val(collegeName);
+
+    $("#editCollegeModal").modal("show");
+  });
+
+  // college code restriction
+  $("#editCollegeCode").on("input", function () {
+    this.value = this.value.replace(/[^A-Za-z]/g, "");
+  });
+
+  // college name restriction
+  $("#editCollegeName").on("input", function () {
+    this.value = this.value.replace(/[^A-Za-z\s]/g, "");
+  });
+
+  // submit validation
+  $("#editForm").submit(function (e) {
+    e.preventDefault();
+
+    const form = $(this);
+    const url = form.attr("action");
+    const data = form.serialize();
 
     $.post(url, data)
       .done(function (response) {
@@ -65,47 +143,10 @@ $(document).ready(function () {
       });
   });
 
-  // Edit College
-  $(".btn-edit").click(function (e) {
-    e.preventDefault();
+  // ================================
+  // DELETE
+  // ================================
 
-    const row = $(this).closest("tr");
-
-    const collegeCode = row.find("td:eq(0)").text().trim();
-    const collegeName = row.find("td:eq(1)").text().trim();
-
-    $("#originalCollegeCode").val(collegeCode);
-    $("#editCollegeCode").val(collegeCode);
-    $("#editCollegeName").val(collegeName);
-
-    $("#editCollegeModal").modal("show");
-  });
-
-  $("#editForm").submit(function (e) {
-    e.preventDefault();
-
-    const form = $(this);
-    const url = form.attr("action");
-    const data = form.serialize();
-
-    $.post(url, data)
-      .done(function (response) {
-        if (response.success) {
-          alert(response.message);
-          location.reload();
-        } else {
-          alert("Error: " + response.message);
-        }
-      })
-      .fail(function (xhr) {
-        const errMsg = xhr.responseJSON
-          ? xhr.responseJSON.message
-          : xhr.statusText;
-        alert("Request failed: " + errMsg);
-      });
-  });
-
-  // Delete College
   $(".btn-delete").click(function (e) {
     e.preventDefault();
     const row = $(this).closest("tr");
