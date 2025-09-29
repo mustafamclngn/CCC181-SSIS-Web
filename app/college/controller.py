@@ -29,21 +29,23 @@ def register_college():
 
     if not code or not name:
         return {"success": False, "message": "All fields are required."}, 400
-    
+
     db = get_db()
     cursor = db.cursor()
     try:
-        cursor.execute(
-            "INSERT INTO colleges (collegecode, collegename) VALUES (%s, %s)",
-            (code, name),
-        )
+        cursor.execute("SELECT COUNT(*) FROM colleges WHERE collegecode = %s OR collegename = %s", (code, name))
+        if cursor.fetchone()[0] > 0:
+            return {"success": False, "message": "College code or name already exists."}, 400
+
+        cursor.execute("INSERT INTO colleges (collegecode, collegename) VALUES (%s, %s)", (code, name))
         db.commit()
-        return {"success": True,}
+        return {"success": True, "message": f"College {name} registered successfully!"}
     except Exception as e:
         db.rollback()
         return {"success": False, "message": str(e)}, 500
     finally:
         cursor.close()
+
 
 # ========= EDIT COLLEGE =========
 # ========= EDIT COLLEGE =========
@@ -62,20 +64,24 @@ def edit_college():
     cursor = db.cursor()
     try:
         cursor.execute(
-            """
-            UPDATE colleges
-            SET collegecode = %s, collegename = %s
-            WHERE collegecode = %s
-            """,
-            (new_code, new_name, original_code),
+            "SELECT COUNT(*) FROM colleges WHERE (collegecode = %s OR collegename = %s) AND collegecode != %s",
+            (new_code, new_name, original_code)
+        )
+        if cursor.fetchone()[0] > 0:
+            return {"success": False, "message": "College code or name already exists."}, 400
+
+        cursor.execute(
+            "UPDATE colleges SET collegecode = %s, collegename = %s WHERE collegecode = %s",
+            (new_code, new_name, original_code)
         )
         db.commit()
-        return {"success": True, "message": f"College updated successfully!"}
+        return {"success": True, "message": f"College {new_name} updated successfully!"}
     except Exception as e:
         db.rollback()
         return {"success": False, "message": str(e)}, 500
     finally:
         cursor.close()
+
 
 # ========= DELETE COLLEGE =========
 # ========= DELETE COLLEGE =========
