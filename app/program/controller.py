@@ -43,16 +43,24 @@ def register_program():
     cursor = db.cursor()
     try:
         cursor.execute(
+            "SELECT COUNT(*) FROM programs WHERE programcode = %s OR programname = %s",
+            (program_code, program_name)
+        )
+        if cursor.fetchone()[0] > 0:
+            return {"success": False, "message": "Program code or name already exists."}, 400
+
+        cursor.execute(
             "INSERT INTO programs (programcode, programname, collegecode) VALUES (%s, %s, %s)",
             (program_code, program_name, college_code)
         )
         db.commit()
-        return {"success": True,}
+        return {"success": True, "message": f"Program {program_name} registered successfully!"}
     except Exception as e:
         db.rollback()
         return {"success": False, "message": str(e)}, 500
     finally:
         cursor.close()
+
 
 # ========= EDIT PROGRAM =========
 # ========= EDIT PROGRAM =========
@@ -72,6 +80,17 @@ def edit_program():
 
     cursor = db.cursor()
     try:
+        cursor.execute(
+            """
+            SELECT COUNT(*) FROM programs
+            WHERE (programcode = %s OR programname = %s)
+              AND programcode != %s
+            """,
+            (new_code, new_name, original_code)
+        )
+        if cursor.fetchone()[0] > 0:
+            return {"success": False, "message": "Program code or name already exists."}, 400
+
         cursor.execute(
             """
             UPDATE programs

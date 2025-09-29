@@ -42,18 +42,14 @@ $(document).ready(function () {
 
   // college name restriction
   $("#collegeName").on("input", function () {
-    if (!this.value.startsWith("College of ")) {
-      this.value = "College of ";
-    }
-    const prefix = "College of ";
-    let suffix = this.value.substring(prefix.length);
-    suffix = suffix.replace(/[^A-Za-z\s]/g, "");
-    this.value = prefix + suffix;
+    this.value = this.value.replace(/[^A-Za-z\s]/g, "");
   });
 
   $("#registerCollegeModal").on("shown.bs.modal", function () {
-    $("#collegeName").val("College of ");
-    $("#collegeCode").val("");
+    const nameField = $("#collegeName");
+    if (!nameField.val().startsWith("College of ")) {
+      nameField.val("College of ");
+    }
   });
 
   // submit validation
@@ -186,42 +182,64 @@ $(document).ready(function () {
   // PROGRAM PAGE
   // ================================
 
-  // Register Program
+  // ================================
+  // REGISTER
+  // ================================
+
+  // program code restriction
+  $("#programCode").on("input", function () {
+    this.value = this.value.replace(/[^A-Za-z]/g, "");
+  });
+
+  // program name restriction
+  $("#programName").on("input", function () {
+    this.value = this.value.replace(/[^A-Za-z\s]/g, "");
+  });
+
+  // Pre-fill "Bachelor of Science in " when modal opens
+  $("#registerProgramModal").on("shown.bs.modal", function () {
+    const nameField = $("#programName");
+    if (!nameField.val().startsWith("Bachelor of Science in ")) {
+      nameField.val("Bachelor of Science in ");
+    }
+  });
+
   $("#registerProgramForm").submit(function (e) {
     e.preventDefault();
 
-    const form = $(this);
-    const url = form.attr("action") || "/programs/register";
-    const code = $("#programCode").val().trim().toUpperCase();
-    const name = $("#programName").val().trim();
-    const college_code = $("#programCollege").val().trim().toUpperCase();
+    const url = $(this).attr("action") || "/programs/register";
+    const data = {
+      code: $("#programCode").val().trim().toUpperCase(),
+      name: $("#programName").val().trim(),
+      college_code: $("#programCollege").val().trim().toUpperCase(),
+    };
 
-    if (!code || !name || !college_code) {
+    if (!data.code || !data.name || !data.college_code) {
       alert("Please fill in all fields.");
       return;
     }
 
-    const data = { code: code, name: name, college_code: college_code };
-
     $.post(url, data)
-      .done(function (response) {
-        if (response.success) {
-          alert(response.message);
+      .done(function (res) {
+        if (res.success) {
           $("#registerProgramModal").modal("hide");
           location.reload();
         } else {
-          alert("Error: " + response.message);
+          alert(res.message);
         }
       })
       .fail(function (xhr) {
-        const errMsg = xhr.responseJSON
+        const msg = xhr.responseJSON
           ? xhr.responseJSON.message
           : xhr.statusText;
-        alert("Request failed: " + errMsg);
+        alert("Request failed: " + msg);
       });
   });
 
-  // Edit Program
+  // ================================
+  // EDIT
+  // ================================
+
   $(".btn-edit").click(function (e) {
     e.preventDefault();
 
@@ -239,6 +257,17 @@ $(document).ready(function () {
     $("#editProgramModal").modal("show");
   });
 
+  // edit program code restriction
+  $("#editProgramCode").on("input", function () {
+    this.value = this.value.replace(/[^A-Za-z]/g, "");
+  });
+
+  // edit program name restriction
+  $("#editProgramName").on("input", function () {
+    this.value = this.value.replace(/[^A-Za-z\s]/g, "");
+  });
+
+  // edit program submit validation
   $("#editProgramForm").submit(function (e) {
     e.preventDefault();
 
@@ -256,33 +285,39 @@ $(document).ready(function () {
         }
       })
       .fail(function (xhr) {
-        alert("Request failed: " + xhr.responseJSON.message);
+        const msg = xhr.responseJSON
+          ? xhr.responseJSON.message
+          : xhr.statusText;
+        alert("Request failed: " + msg);
       });
   });
 
-  // Delete Program
+  // ================================
+  // DELETE
+  // ================================
+
   $(".btn-delete").click(function (e) {
     e.preventDefault();
     const row = $(this).closest("tr");
-    const studentId = row.find("td:eq(0)").text().trim();
+    const programCode = row.find("td:eq(0)").text().trim();
 
-    $("#deleteStudentId").val(studentId);
-    $("#deleteStudentModal").modal("show");
+    $("#deleteProgramCode").val(programCode);
+    $("#deleteProgramModal").modal("show");
   });
 
-  $("#confirmDeleteStudentBtn").click(function () {
-    const studentId = $("#deleteStudentId").val();
+  $("#confirmDeleteProgramBtn").click(function () {
+    const programCode = $("#deleteProgramCode").val();
 
-    if (!studentId) {
-      alert("No student selected for deletion.");
+    if (!programCode) {
+      alert("No program selected for deletion.");
       return;
     }
 
-    $.post("/students/delete", { id_number: studentId })
+    $.post("/programs/delete", { code: programCode })
       .done(function (response) {
         if (response.success) {
           alert(response.message);
-          $("#deleteStudentModal").modal("hide");
+          $("#deleteProgramModal").modal("hide");
           location.reload();
         } else {
           alert("Error: " + response.message);
