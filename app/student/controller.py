@@ -61,13 +61,11 @@ def register_student():
     db = get_db()
     cursor = db.cursor()
     try:
-        # ✅ Check if student with same ID already exists
         cursor.execute("SELECT idnumber FROM students WHERE idnumber = %s", (id_number,))
         existing = cursor.fetchone()
         if existing:
             return {"success": False, "message": "Student ID already exists."}, 400
 
-        # If not duplicate, insert
         cursor.execute(
             """
             INSERT INTO students (idnumber, firstname, lastname, gender, yearlevel, programcode)
@@ -103,7 +101,6 @@ def edit_student():
     db = get_db()
     cursor = db.cursor()
     try:
-        # 🔹 Check if new ID already exists (and is not the same as original)
         cursor.execute(
             "SELECT idnumber FROM students WHERE idnumber = %s AND idnumber != %s",
             (id_number, original_id)
@@ -112,7 +109,6 @@ def edit_student():
         if duplicate:
             return {"success": False, "message": "A student with this ID already exists."}, 400
 
-        # 🔹 Proceed with update
         cursor.execute(
             """
             UPDATE students

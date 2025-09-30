@@ -10,6 +10,7 @@ from app.database import get_db, close_db
 from app.college import college_bp
 from app.program import program_bp
 from app.student import student_bp
+from app.dashboard import dashboard_bp
 
 load_dotenv()
 
@@ -20,12 +21,13 @@ def create_app():
     
     app.register_blueprint(college_bp)
     app.register_blueprint(program_bp)
-    app.register_blueprint(student_bp) 
+    app.register_blueprint(student_bp)
+    app.register_blueprint(dashboard_bp)
 
-    @app.route("/")
-    @app.route("/dashboard")
-    def dashboard():
-        return render_template("dashboard.html")
+    # @app.route("/")
+    # @app.route("/dashboard")
+    # def dashboard():
+    #     return render_template("dashboard.html")
 
     @app.route("/login")
     def login():
