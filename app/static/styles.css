@@ -63,7 +63,6 @@ body {
   padding-bottom: 1rem;
 }
 
-/* collapsed sidebar */
 #sidebar.collapsed {
   width: var(--sidebar-collapsed-width);
 }
@@ -88,7 +87,6 @@ body {
   overflow-x: auto;
 }
 
-/* table */
 table th:last-child,
 table td:last-child {
   text-align: center;
@@ -109,7 +107,17 @@ table td:last-child {
   font-size: 1.2rem;
 }
 
-/* login form */
+.count-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease,
+    background-color 0.3s ease;
+  cursor: pointer;
+}
+
+.count-card:hover {
+  background-color: #0d6efd;
+  color: #fff;
+}
+
 body.login-page {
   background-color: #dde1ea;
   display: flex;
