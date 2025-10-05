@@ -74,7 +74,7 @@ def register_student():
             (id_number, first_name, last_name, gender, year_level, program_code)
         )
         db.commit()
-        return {"success": True, "message": "Student registered successfully."}
+        return "", 204
     except Exception as e:
         db.rollback()
         return {"success": False, "message": str(e)}, 500
@@ -123,7 +123,7 @@ def edit_student():
             (id_number, first_name, last_name, gender, year_level, program_code, original_id)
         )
         db.commit()
-        return {"success": True, "message": "Student updated successfully!"}
+        return "", 204
     except Exception as e:
         db.rollback()
         return {"success": False, "message": str(e)}, 500
@@ -147,7 +147,7 @@ def delete_student():
     try:
         cursor.execute("DELETE FROM students WHERE idnumber = %s", (student_id,))
         db.commit()
-        return {"success": True, "message": f"Student deleted successfully!"}
+        return "", 204
     except Exception as e:
         db.rollback()
         return {"success": False, "message": str(e)}, 500

@@ -1,27 +1,25 @@
-from flask import Flask, render_template, Blueprint, request, flash, redirect, url_for
+from flask import Flask, render_template, Blueprint, request
 from app.database import close_db, get_db
 
 college_bp = Blueprint("college", __name__, template_folder="templates")
 
 @college_bp.route("/colleges")
 def colleges():
-  db = get_db()
-  cursor = db.cursor()
-  cursor.execute("SELECT * FROM colleges ORDER BY collegecode ASC")
-  colleges_data = cursor.fetchall()
-  cursor.close()
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute("SELECT * FROM colleges ORDER BY collegecode ASC")
+    colleges_data = cursor.fetchall()
+    cursor.close()
 
-  colleges_list = [{"collegecode": c[0], "collegename": c[1]} for c in colleges_data]
+    colleges_list = [{"collegecode": c[0], "collegename": c[1]} for c in colleges_data]
 
-  return render_template(
-      "colleges.html",
-      colleges=colleges_list,
-  )
+    return render_template(
+        "colleges.html",
+        colleges=colleges_list,
+    )
+
 
 # ========= REGISTER COLLEGE =========
-# ========= REGISTER COLLEGE =========
-# ========= REGISTER COLLEGE =========
-
 @college_bp.route("/colleges/register", methods=["POST"])
 def register_college():
     code = request.form.get("code", "").strip().upper()
@@ -39,7 +37,7 @@ def register_college():
 
         cursor.execute("INSERT INTO colleges (collegecode, collegename) VALUES (%s, %s)", (code, name))
         db.commit()
-        return {"success": True, "message": f"College {name} registered successfully!"}
+        return "", 204
     except Exception as e:
         db.rollback()
         return {"success": False, "message": str(e)}, 500
@@ -48,9 +46,6 @@ def register_college():
 
 
 # ========= EDIT COLLEGE =========
-# ========= EDIT COLLEGE =========
-# ========= EDIT COLLEGE =========
-
 @college_bp.route("/colleges/edit", methods=["POST"])
 def edit_college():
     original_code = request.form.get("original_code", "").strip().upper()
@@ -75,7 +70,7 @@ def edit_college():
             (new_code, new_name, original_code)
         )
         db.commit()
-        return {"success": True, "message": f"College {new_name} updated successfully!"}
+        return "", 204
     except Exception as e:
         db.rollback()
         return {"success": False, "message": str(e)}, 500
@@ -84,9 +79,6 @@ def edit_college():
 
 
 # ========= DELETE COLLEGE =========
-# ========= DELETE COLLEGE =========
-# ========= DELETE COLLEGE =========
-
 @college_bp.route("/colleges/delete", methods=["POST"])
 def delete_college():
     code = request.form.get("code", "").strip().upper()
@@ -99,7 +91,7 @@ def delete_college():
     try:
         cursor.execute("DELETE FROM colleges WHERE collegecode = %s", (code,))
         db.commit()
-        return {"success": True, "message": f"College deleted successfully!"}
+        return "", 204
     except Exception as e:
         db.rollback()
         return {"success": False, "message": str(e)}, 500

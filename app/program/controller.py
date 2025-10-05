@@ -54,7 +54,7 @@ def register_program():
             (program_code, program_name, college_code)
         )
         db.commit()
-        return {"success": True, "message": f"Program {program_name} registered successfully!"}
+        return "", 204
     except Exception as e:
         db.rollback()
         return {"success": False, "message": str(e)}, 500
@@ -102,7 +102,7 @@ def edit_program():
             (new_code, new_name, new_college_code, original_code)
         )
         db.commit()
-        return {"success": True, "message": f"Program updated successfully!"}
+        return "", 204
     except Exception as e:
         db.rollback()
         return {"success": False, "message": str(e)}, 500
@@ -125,7 +125,7 @@ def delete_program():
     try:
         cursor.execute("DELETE FROM programs WHERE programcode = %s", (code,))
         db.commit()
-        return {"success": True, "message": f"Program deleted successfully."}
+        return "", 204
     except Exception as e:
         db.rollback()
         return {"success": False, "message": str(e)}, 500
