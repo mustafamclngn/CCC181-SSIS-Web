@@ -66,22 +66,19 @@ $(document).ready(function () {
       return;
     }
 
-    $.post(url, { code: code, name: name })
-      .done(function (response) {
-        if (response.success) {
-          alert(response.message);
+    $.ajax({
+      url: url,
+      method: "POST",
+      data: { code: code, name: name },
+      complete: function (xhr) {
+        if (xhr.status === 204) {
           $("#registerCollegeModal").modal("hide");
           location.reload();
-        } else {
-          alert("Error: " + response.message);
+        } else if (xhr.responseJSON && xhr.responseJSON.message) {
+          alert("Error: " + xhr.responseJSON.message);
         }
-      })
-      .fail(function (xhr) {
-        const errMsg = xhr.responseJSON
-          ? xhr.responseJSON.message
-          : xhr.statusText;
-        alert("Request failed: " + errMsg);
-      });
+      },
+    });
   });
 
   // ================================
@@ -121,22 +118,19 @@ $(document).ready(function () {
     const url = form.attr("action");
     const data = form.serialize();
 
-    $.post(url, data)
-      .done(function (response) {
-        if (response.success) {
-          alert(response.message);
-          $("#registerCollegeModal").modal("hide");
+    $.ajax({
+      url: url,
+      method: "POST",
+      data: data,
+      complete: function (xhr) {
+        if (xhr.status === 204) {
+          $("#editCollegeModal").modal("hide");
           location.reload();
-        } else {
-          alert("Error: " + response.message);
+        } else if (xhr.responseJSON && xhr.responseJSON.message) {
+          alert("Error: " + xhr.responseJSON.message);
         }
-      })
-      .fail(function (xhr) {
-        const errMsg = xhr.responseJSON
-          ? xhr.responseJSON.message
-          : xhr.statusText;
-        alert("Request failed: " + errMsg);
-      });
+      },
+    });
   });
 
   // ================================
@@ -160,22 +154,19 @@ $(document).ready(function () {
       return;
     }
 
-    $.post("/colleges/delete", { code: code })
-      .done(function (response) {
-        if (response.success) {
-          alert(response.message);
+    $.ajax({
+      url: "/colleges/delete",
+      method: "POST",
+      data: { code: code },
+      complete: function (xhr) {
+        if (xhr.status === 204) {
           $("#deleteCollegeModal").modal("hide");
           location.reload();
-        } else {
-          alert("Error: " + response.message);
+        } else if (xhr.responseJSON && xhr.responseJSON.message) {
+          alert("Error: " + xhr.responseJSON.message);
         }
-      })
-      .fail(function (xhr) {
-        const errMsg = xhr.responseJSON
-          ? xhr.responseJSON.message
-          : xhr.statusText;
-        alert("Request failed: " + errMsg);
-      });
+      },
+    });
   });
 
   // ================================
@@ -219,21 +210,19 @@ $(document).ready(function () {
       return;
     }
 
-    $.post(url, data)
-      .done(function (res) {
-        if (res.success) {
+    $.ajax({
+      url: url,
+      method: "POST",
+      data: data,
+      complete: function (xhr) {
+        if (xhr.status === 204) {
           $("#registerProgramModal").modal("hide");
           location.reload();
-        } else {
-          alert(res.message);
+        } else if (xhr.responseJSON && xhr.responseJSON.message) {
+          alert("Error: " + xhr.responseJSON.message);
         }
-      })
-      .fail(function (xhr) {
-        const msg = xhr.responseJSON
-          ? xhr.responseJSON.message
-          : xhr.statusText;
-        alert("Request failed: " + msg);
-      });
+      },
+    });
   });
 
   // ================================
@@ -275,21 +264,19 @@ $(document).ready(function () {
     const url = form.attr("action");
     const data = form.serialize();
 
-    $.post(url, data)
-      .done(function (response) {
-        if (response.success) {
-          alert(response.message);
+    $.ajax({
+      url: url,
+      method: "POST",
+      data: data,
+      complete: function (xhr) {
+        if (xhr.status === 204) {
+          $("#editProgramModal").modal("hide");
           location.reload();
-        } else {
-          alert("Error: " + response.message);
+        } else if (xhr.responseJSON && xhr.responseJSON.message) {
+          alert("Error: " + xhr.responseJSON.message);
         }
-      })
-      .fail(function (xhr) {
-        const msg = xhr.responseJSON
-          ? xhr.responseJSON.message
-          : xhr.statusText;
-        alert("Request failed: " + msg);
-      });
+      },
+    });
   });
 
   // ================================
@@ -313,22 +300,19 @@ $(document).ready(function () {
       return;
     }
 
-    $.post("/programs/delete", { code: programCode })
-      .done(function (response) {
-        if (response.success) {
-          alert(response.message);
+    $.ajax({
+      url: "/programs/delete",
+      method: "POST",
+      data: { code: programCode },
+      complete: function (xhr) {
+        if (xhr.status === 204) {
           $("#deleteProgramModal").modal("hide");
           location.reload();
-        } else {
-          alert("Error: " + response.message);
+        } else if (xhr.responseJSON && xhr.responseJSON.message) {
+          alert("Error: " + xhr.responseJSON.message);
         }
-      })
-      .fail(function (xhr) {
-        const errMsg = xhr.responseJSON
-          ? xhr.responseJSON.message
-          : xhr.statusText;
-        alert("Request failed: " + errMsg);
-      });
+      },
+    });
   });
 
   // ================================
@@ -400,22 +384,21 @@ $(document).ready(function () {
 
     const url = $(this).attr("action") || "/students/register";
 
-    $.post(url, data)
-      .done(function (response) {
-        if (response.success) {
-          alert(response.message);
+    $.ajax({
+      url: url,
+      method: "POST",
+      data: data, // form data for student registration
+      complete: function (xhr) {
+        if (xhr.status === 204) {
+          // ✅ silent success
           $("#registerStudentModal").modal("hide");
           location.reload();
-        } else {
-          alert("Error: " + response.message);
+        } else if (xhr.responseJSON && xhr.responseJSON.message) {
+          // ❌ only show errors
+          alert("Error: " + xhr.responseJSON.message);
         }
-      })
-      .fail(function (xhr) {
-        const errMsg = xhr.responseJSON
-          ? xhr.responseJSON.message
-          : xhr.statusText;
-        alert("Request failed: " + errMsg);
-      });
+      },
+    });
   });
 
   // ================================
@@ -497,19 +480,20 @@ $(document).ready(function () {
     const url = form.attr("action");
     const data = form.serialize();
 
-    $.post(url, data)
-      .done(function (response) {
-        if (response.success) {
-          alert(response.message);
+    $.ajax({
+      url: url,
+      method: "POST",
+      data: data, // serialized form data
+      complete: function (xhr) {
+        if (xhr.status === 204) {
+          // ✅ silent success
           location.reload();
-        } else {
-          alert("Error: " + response.message);
+        } else if (xhr.responseJSON && xhr.responseJSON.message) {
+          // ❌ only show errors
+          alert("Error: " + xhr.responseJSON.message);
         }
-      })
-      .fail(function (xhr) {
-        let res = xhr.responseJSON;
-        alert("Request failed: " + (res ? res.message : xhr.responseText));
-      });
+      },
+    });
   });
 
   // ================================
@@ -540,19 +524,20 @@ $(document).ready(function () {
       return;
     }
 
-    $.post("/students/delete", { id_number: studentId })
-      .done(function (response) {
-        if (response.success) {
-          alert(response.message);
+    $.ajax({
+      url: "/students/delete",
+      method: "POST",
+      data: { id_number: studentId },
+      complete: function (xhr) {
+        if (xhr.status === 204) {
+          // ✅ silent success
           $("#deleteStudentModal").modal("hide");
           location.reload();
-        } else {
-          alert("Error: " + response.message);
+        } else if (xhr.responseJSON && xhr.responseJSON.message) {
+          // ❌ only show errors
+          alert("Error: " + xhr.responseJSON.message);
         }
-      })
-      .fail(function (xhr) {
-        const res = xhr.responseJSON;
-        alert("Request failed: " + (res ? res.message : xhr.responseText));
-      });
+      },
+    });
   });
 });
