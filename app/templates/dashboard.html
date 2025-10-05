@@ -3,8 +3,8 @@
 <div class="row mb-4">
   <!-- total colleges -->
   <div class="col-md-4">
-    <div class="card shadow-sm p-3 rounded-3 text-center">
-      <i class="bi bi-mortarboard fs-1 text-primary"></i>
+    <div class="card count-card shadow-sm p-3 rounded-3 text-center">
+      <i class="bi bi-mortarboard fs-1"></i>
       <h5 class="mt-2">Registered Colleges</h5>
       <h2>{{ total_colleges }}</h2>
     </div>
@@ -12,8 +12,8 @@
 
   <!-- total programs -->
   <div class="col-md-4">
-    <div class="card shadow-sm p-3 rounded-3 text-center">
-      <i class="bi bi-journal-bookmark fs-1 text-success"></i>
+    <div class="card count-card shadow-sm p-3 rounded-3 text-center">
+      <i class="bi bi-journal-bookmark fs-1"></i>
       <h5 class="mt-2">Registered Programs</h5>
       <h2>{{ total_programs }}</h2>
     </div>
@@ -21,17 +21,80 @@
 
   <!-- total students -->
   <div class="col-md-4">
-    <div class="card shadow-sm p-3 rounded-3 text-center">
-      <i class="bi bi-people fs-1 text-warning"></i>
+    <div class="card count-card shadow-sm p-3 rounded-3 text-center">
+      <i class="bi bi-people fs-1"></i>
       <h5 class="mt-2">Registered Students</h5>
       <h2>{{ total_students }}</h2>
     </div>
   </div>
 </div>
 
-<div class="card shadow-sm p-4 rounded-3">
-  <h3>Dashboard</h3>
-  <p>This is the dashboard page</p>
+<div class="row">
+  <!-- top 5 colleges -->
+  <div class="col-md-6 mb-4">
+    <div class="card shadow-sm rounded-3">
+      <div class="card-header bg-primary text-white fw-bold">
+        Top 5 Colleges with Most Students
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-striped mb-0">
+          <thead class="table-light">
+            <tr>
+              <th scope="col">College</th>
+              <th scope="col" class="text-center">Students</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for college, count in top_colleges %}
+            <tr>
+              <td>{{ college }}</td>
+              <td class="text-center">{{ count }}</td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="2" class="text-center text-muted py-3">
+                No data available
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- top 5 programs -->
+  <div class="col-md-6 mb-4">
+    <div class="card shadow-sm rounded-3">
+      <div class="card-header bg-success text-white fw-bold">
+        Top 5 Programs with Most Students
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-striped mb-0">
+          <thead class="table-light">
+            <tr>
+              <th scope="col">Program</th>
+              <th scope="col" class="text-center">Students</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for program, count in top_programs %}
+            <tr>
+              <td>{{ program }}</td>
+              <td class="text-center">{{ count }}</td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="2" class="text-center text-muted py-3">
+                No data available
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>
 
 {% endblock %}
