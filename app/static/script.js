@@ -387,14 +387,12 @@ $(document).ready(function () {
     $.ajax({
       url: url,
       method: "POST",
-      data: data, // form data for student registration
+      data: data,
       complete: function (xhr) {
         if (xhr.status === 204) {
-          // ✅ silent success
           $("#registerStudentModal").modal("hide");
           location.reload();
         } else if (xhr.responseJSON && xhr.responseJSON.message) {
-          // ❌ only show errors
           alert("Error: " + xhr.responseJSON.message);
         }
       },
@@ -483,13 +481,11 @@ $(document).ready(function () {
     $.ajax({
       url: url,
       method: "POST",
-      data: data, // serialized form data
+      data: data,
       complete: function (xhr) {
         if (xhr.status === 204) {
-          // ✅ silent success
           location.reload();
         } else if (xhr.responseJSON && xhr.responseJSON.message) {
-          // ❌ only show errors
           alert("Error: " + xhr.responseJSON.message);
         }
       },
@@ -530,11 +526,9 @@ $(document).ready(function () {
       data: { id_number: studentId },
       complete: function (xhr) {
         if (xhr.status === 204) {
-          // ✅ silent success
           $("#deleteStudentModal").modal("hide");
           location.reload();
         } else if (xhr.responseJSON && xhr.responseJSON.message) {
-          // ❌ only show errors
           alert("Error: " + xhr.responseJSON.message);
         }
       },

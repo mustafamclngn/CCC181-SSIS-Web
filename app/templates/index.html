@@ -71,7 +71,7 @@
             </a>
           </li>
           <li class="sidebar-item">
-            <a href="{{ url_for('users') }}" class="sidebar-link nav-link">
+            <a href="{{ url_for('user.users') }}" class="sidebar-link nav-link">
               <i class="bi bi-person fs-1"></i> <span>Users</span>
             </a>
           </li>
@@ -126,7 +126,9 @@
             >
               Cancel
             </button>
-            <button type="button" class="btn btn-danger">Logout</button>
+            <a href="{{ url_for('user.logout') }}" class="btn btn-danger"
+              >Logout</a
+            >
           </div>
         </div>
       </div>
