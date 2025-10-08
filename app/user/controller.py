@@ -1,26 +1,26 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from flask import Blueprint, render_template, redirect, url_for, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.database import get_db, close_db
 from psycopg2.extras import RealDictCursor
+from app.user.forms import RegisterForm, LoginForm
 
-user_bp = Blueprint("user", __name__, template_folder="../templates")
+user_bp = Blueprint("user", __name__, template_folder="templates")
 
 @user_bp.route("/users")
 def users():
     db = get_db()
     cursor = db.cursor(cursor_factory=RealDictCursor)
-
     cursor.execute("SELECT username, email, password FROM users ORDER BY username ASC")
     users_data = cursor.fetchall()
-
     cursor.close()
     return render_template("users.html", users=users_data)
 
 @user_bp.route("/login", methods=["GET", "POST"])
 def login():
-    if request.method == "POST":
-        username = request.form.get("username")
-        password = request.form.get("password")
+    form = LoginForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        password = form.password.data
 
         db = get_db()
         cur = db.cursor()
@@ -36,23 +36,18 @@ def login():
         else:
             flash("Invalid username or password.", "danger")
 
-    return render_template("login.html")
+    return render_template("login.html", form=form)
 
 @user_bp.route("/register", methods=["GET", "POST"])
 def register():
-    if request.method == "POST":
-        username = request.form.get("username")
-        email = request.form.get("email")
-        password = request.form.get("password")
-        confirm = request.form.get("confirmPassword")
-
-        if password != confirm:
-            flash("Passwords do not match!", "danger")
-            return redirect(url_for("user.register"))
+    form = RegisterForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        email = form.email.data
+        password = form.password.data
 
         db = get_db()
         cur = db.cursor()
-
         try:
             hashed = generate_password_hash(password)
             cur.execute(
@@ -62,14 +57,14 @@ def register():
             db.commit()
             flash("Account created successfully!", "success")
             return redirect(url_for("user.login"))
-        except Exception as e:
+        except Exception:
             db.rollback()
-            flash("Username or email already exists.", "danger")
+            flash("An error occurred. Please try again.", "danger")
         finally:
             cur.close()
             close_db()
 
-    return render_template("register.html")
+    return render_template("register.html", form=form)
 
 @user_bp.route("/logout")
 def logout():
