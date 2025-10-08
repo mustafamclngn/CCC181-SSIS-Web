@@ -3,17 +3,21 @@ from app.database import close_db, get_db
 
 student_bp = Blueprint("student", __name__, template_folder="templates")
 
+# ==============================
+# STUDENTS PAGE
+# ==============================
 @student_bp.route("/students")
 def students():
     db = get_db()
 
+    # fetch programs
     cursor = db.cursor()
     cursor.execute("SELECT programcode, programname FROM programs ORDER BY programname ASC")
     programs_data = cursor.fetchall()
     cursor.close()
-
     programs_list = [{"code": p[0], "name": p[1]} for p in programs_data]
 
+    # fetch students
     cursor = db.cursor()
     cursor.execute("""
         SELECT idnumber, firstname, lastname, gender, yearlevel, programcode
@@ -22,7 +26,6 @@ def students():
     """)
     students_data = cursor.fetchall()
     cursor.close()
-
     students_list = [
         {
             "id_number": s[0],
@@ -42,10 +45,9 @@ def students():
         programs=programs_list
     )
 
-# ========= REGISTER STUDENT =========
-# ========= REGISTER STUDENT =========
-# ========= REGISTER STUDENT =========
-
+# ==============================
+# REGISTER STUDENT
+# ==============================
 @student_bp.route("/students/register", methods=["POST"])
 def register_student():
     id_number = request.form.get("id_number", "").strip()
@@ -56,15 +58,16 @@ def register_student():
     program_code = request.form.get("program_code", "").strip().upper()
 
     if not id_number or not first_name or not last_name or not gender or not year_level or not program_code:
-        return {"success": False, "message": "All fields are required."}, 400
+        flash("All fields are required.", "danger")
+        return redirect(url_for("student.students"))
 
     db = get_db()
     cursor = db.cursor()
     try:
         cursor.execute("SELECT idnumber FROM students WHERE idnumber = %s", (id_number,))
-        existing = cursor.fetchone()
-        if existing:
-            return {"success": False, "message": "Student ID already exists."}, 400
+        if cursor.fetchone():
+            flash("Student ID already exists.", "warning")
+            return redirect(url_for("student.students"))
 
         cursor.execute(
             """
@@ -74,17 +77,18 @@ def register_student():
             (id_number, first_name, last_name, gender, year_level, program_code)
         )
         db.commit()
-        return "", 204
+        flash("Student registered successfully!", "success")
     except Exception as e:
         db.rollback()
-        return {"success": False, "message": str(e)}, 500
+        flash(f"Error: {str(e)}", "danger")
     finally:
         cursor.close()
 
-# ========= EDIT STUDENT =========
-# ========= EDIT STUDENT =========
-# ========= EDIT STUDENT =========
+    return redirect(url_for("student.students"))
 
+# ==============================
+# EDIT STUDENT
+# ==============================
 @student_bp.route("/students/edit", methods=["POST"])
 def edit_student():
     original_id = request.form.get("original_id", "").strip()
@@ -96,7 +100,8 @@ def edit_student():
     program_code = request.form.get("program_code", "").strip().upper()
 
     if not original_id or not id_number or not first_name or not last_name or not gender or not year_level or not program_code:
-        return {"success": False, "message": "All fields are required."}, 400
+        flash("All fields are required.", "danger")
+        return redirect(url_for("student.students"))
 
     db = get_db()
     cursor = db.cursor()
@@ -105,9 +110,9 @@ def edit_student():
             "SELECT idnumber FROM students WHERE idnumber = %s AND idnumber != %s",
             (id_number, original_id)
         )
-        duplicate = cursor.fetchone()
-        if duplicate:
-            return {"success": False, "message": "A student with this ID already exists."}, 400
+        if cursor.fetchone():
+            flash("A student with this ID already exists.", "warning")
+            return redirect(url_for("student.students"))
 
         cursor.execute(
             """
@@ -123,33 +128,36 @@ def edit_student():
             (id_number, first_name, last_name, gender, year_level, program_code, original_id)
         )
         db.commit()
-        return "", 204
+        flash("Student updated successfully!", "success")
     except Exception as e:
         db.rollback()
-        return {"success": False, "message": str(e)}, 500
+        flash(f"Error: {str(e)}", "danger")
     finally:
         cursor.close()
 
+    return redirect(url_for("student.students"))
 
-# ========= DELETE STUDENT =========
-# ========= DELETE STUDENT =========
-# ========= DELETE STUDENT =========
-
+# ==============================
+# DELETE STUDENT
+# ==============================
 @student_bp.route("/students/delete", methods=["POST"])
 def delete_student():
     student_id = request.form.get("id_number", "").strip()
 
     if not student_id:
-        return {"success": False, "message": "Student ID is required."}, 400
+        flash("Student ID is required!", "danger")
+        return redirect(url_for("student.students"))
 
     db = get_db()
     cursor = db.cursor()
     try:
         cursor.execute("DELETE FROM students WHERE idnumber = %s", (student_id,))
         db.commit()
-        return "", 204
+        flash("Student deleted successfully!", "success")
     except Exception as e:
         db.rollback()
-        return {"success": False, "message": str(e)}, 500
+        flash(f"Error: {str(e)}", "danger")
     finally:
         cursor.close()
+
+    return redirect(url_for("student.students"))
