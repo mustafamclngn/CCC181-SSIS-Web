@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Blueprint, request
+from flask import Flask, render_template, Blueprint, request, redirect, url_for, flash
 from app.database import close_db, get_db
 
 college_bp = Blueprint("college", __name__, template_folder="templates")
@@ -26,21 +26,25 @@ def register_college():
     name = request.form.get("name", "").strip().title()
 
     if not code or not name:
-        return {"success": False, "message": "All fields are required."}, 400
+        flash("All fields are required.", "danger")
+        return redirect(url_for("college.colleges"))
 
     db = get_db()
     cursor = db.cursor()
     try:
         cursor.execute("SELECT COUNT(*) FROM colleges WHERE collegecode = %s OR collegename = %s", (code, name))
         if cursor.fetchone()[0] > 0:
-            return {"success": False, "message": "College code or name already exists."}, 400
+            flash("College code or name already exists.", "warning")
+            return redirect(url_for("college.colleges"))
 
         cursor.execute("INSERT INTO colleges (collegecode, collegename) VALUES (%s, %s)", (code, name))
         db.commit()
-        return "", 204
+        flash("College registered successfully!", "success")
+        return redirect(url_for("college.colleges"))
     except Exception as e:
         db.rollback()
-        return {"success": False, "message": str(e)}, 500
+        flash(f"Error: {str(e)}", "danger")
+        return redirect(url_for("college.colleges"))
     finally:
         cursor.close()
 
@@ -53,7 +57,8 @@ def edit_college():
     new_name = request.form.get("name", "").strip().title()
 
     if not original_code or not new_code or not new_name:
-        return {"success": False, "message": "All fields are required."}, 400
+        flash("All fields are required.", "danger")
+        return redirect(url_for("college.colleges"))
 
     db = get_db()
     cursor = db.cursor()
@@ -63,17 +68,20 @@ def edit_college():
             (new_code, new_name, original_code)
         )
         if cursor.fetchone()[0] > 0:
-            return {"success": False, "message": "College code or name already exists."}, 400
+            flash("College code or name already exists.", "warning")
+            return redirect(url_for("college.colleges"))
 
         cursor.execute(
             "UPDATE colleges SET collegecode = %s, collegename = %s WHERE collegecode = %s",
             (new_code, new_name, original_code)
         )
         db.commit()
-        return "", 204
+        flash("College updated successfully!", "success")
+        return redirect(url_for("college.colleges"))
     except Exception as e:
         db.rollback()
-        return {"success": False, "message": str(e)}, 500
+        flash(f"Error: {str(e)}", "danger")
+        return redirect(url_for("college.colleges"))
     finally:
         cursor.close()
 
@@ -84,16 +92,19 @@ def delete_college():
     code = request.form.get("code", "").strip().upper()
 
     if not code:
-        return {"success": False, "message": "College code is missing!"}, 400
+        flash("College code is missing!", "danger")
+        return redirect(url_for("college.colleges"))
 
     db = get_db()
     cursor = db.cursor()
     try:
         cursor.execute("DELETE FROM colleges WHERE collegecode = %s", (code,))
         db.commit()
-        return "", 204
+        flash("College deleted successfully!", "success")
+        return redirect(url_for("college.colleges"))
     except Exception as e:
         db.rollback()
-        return {"success": False, "message": str(e)}, 500
+        flash(f"Error: {str(e)}", "danger")
+        return redirect(url_for("college.colleges"))
     finally:
         cursor.close()
