@@ -6,15 +6,6 @@ from app.user.forms import RegisterForm, LoginForm
 
 user_bp = Blueprint("user", __name__, template_folder="templates")
 
-@user_bp.route("/users")
-def users():
-    db = get_db()
-    cursor = db.cursor(cursor_factory=RealDictCursor)
-    cursor.execute("SELECT username, email, password FROM users ORDER BY username ASC")
-    users_data = cursor.fetchall()
-    cursor.close()
-    return render_template("users.html", users=users_data)
-
 @user_bp.route("/login", methods=["GET", "POST"])
 def login():
     form = LoginForm()
