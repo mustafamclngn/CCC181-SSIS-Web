@@ -15,8 +15,8 @@
   </head>
   <body class="login-page">
     <div class="login-container">
-      <div class="card shadow-sm p-4 rounded-4">
-        <h3 class="text-center mb-4">Create Account</h3>
+      <div class="card shadow-lg p-4 rounded-4">
+        <h3 class="text-center mb-1">Create Account</h3>
         <p class="text-center text-muted mb-4">Sign up to get started</p>
 
         <form method="POST" action="{{ url_for('user.register') }}">
@@ -48,20 +48,22 @@
 
           <div class="mb-3">
             {{ form.confirm_password.label(class="form-label") }} {{
-            form.confirm_password(class="form-control", placeholder="Confirm password") }} {% for error in form.confirm_password.errors %}
+            form.confirm_password(class="form-control", placeholder="Confirm
+            password") }} {% for error in form.confirm_password.errors %}
             <div class="text-danger small">{{ error }}</div>
             {% endfor %}
           </div>
 
           <div class="d-grid">
-            {{ form.submit(class="btn btn-primary w-100", value="Create Account") }}
+            {{ form.submit(class="btn btn-primary w-100", value="Create
+            Account") }}
           </div>
         </form>
 
-        <p class="text-center mt-3">
+        <p class="text-center mt-3" style="font-size: 0.95rem">
           Already have an account?
           <a href="{{ url_for('user.login') }}" class="create-account-link"
-            >Login</a
+            >Sign In</a
           >
         </p>
       </div>

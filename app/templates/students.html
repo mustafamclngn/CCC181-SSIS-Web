@@ -1,16 +1,19 @@
 {% extends "index.html" %} {% block content %}
 
-<div class="container-fluid p-4 rounded-4 bg-white shadow-sm">
-  <!-- flash messages to toast -->
-  <div style="display: none">
-    {% with messages = get_flashed_messages(with_categories=true) %} {% if
-    messages %} {% for category, message in messages %}
-    <div class="alert alert-{{ category }}">{{ message }}</div>
-    {% endfor %} {% endif %} {% endwith %}
-  </div>
+<!-- flash messages to toast -->
+<div style="display: none">
+  {% with messages = get_flashed_messages(with_categories=true) %} {% if
+  messages %} {% for category, message in messages %}
+  <div class="alert alert-{{ category }}">{{ message }}</div>
+  {% endfor %} {% endif %} {% endwith %}
+</div>
 
+<div class="container-fluid p-4 rounded-4 bg-white shadow-sm">
   <div class="d-flex justify-content-between align-items-center mb-3">
-    <h3>Student Records</h3>
+    <div>
+      <h3>Student Records</h3>
+      <p class="text-muted mb-0">View all registered students</p>
+    </div>
     <a
       href="#"
       class="btn btn-success"

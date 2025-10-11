@@ -15,11 +15,10 @@
   </head>
   <body class="login-page">
     <div class="login-container">
-      <div class="card shadow-sm p-4 rounded-4">
-        <h3 class="text-center mb-4">Welcome Back!</h3>
+      <div class="card shadow-lg p-4 rounded-4">
+        <h3 class="text-center mb-1">Welcome Back!</h3>
         <p class="text-center text-muted mb-4">Sign in to your account</p>
 
-        <!-- flash messages to toast -->
         <div style="display: none">
           {% with messages = get_flashed_messages(with_categories=true) %} {% if
           messages %} {% for category, message in messages %}
@@ -55,10 +54,10 @@
             {{ form.submit(class="btn btn-primary w-100", value="Sign In") }}
           </div>
         </form>
-
-        <p class="text-center">
+        <p class="text-center" style="font-size: 0.95rem">
+          Don't have an account?
           <a href="{{ url_for('user.register') }}" class="create-account-link"
-            >Create an account</a
+            >Sign Up</a
           >
         </p>
       </div>

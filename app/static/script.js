@@ -42,7 +42,10 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 $(document).ready(function () {
-  $("#data-table").DataTable();
+  $("#data-table").DataTable({
+    pageLength: 15,
+    lengthMenu: [15, 25, 35],
+  });
 
   // Sidebar Toggle
   const toggleBtn = document.getElementById("toggle-btn");
