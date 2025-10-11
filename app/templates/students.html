@@ -1,7 +1,6 @@
 {% extends "index.html" %} {% block content %}
 
 <div class="container-fluid p-4 rounded-4 bg-white shadow-sm">
-  
   <!-- flash messages to toast -->
   <div style="display: none">
     {% with messages = get_flashed_messages(with_categories=true) %} {% if
@@ -87,6 +86,7 @@
                 class="form-control"
                 id="idNumber"
                 name="id_number"
+                placeholder="e.g. 2024-0001"
                 required
               />
             </div>
@@ -97,6 +97,7 @@
                 class="form-control"
                 id="firstName"
                 name="first_name"
+                placeholder="Enter first name"
                 required
               />
             </div>
@@ -107,6 +108,7 @@
                 class="form-control"
                 id="lastName"
                 name="last_name"
+                placeholder="Enter last name"
                 required
               />
             </div>
@@ -118,6 +120,7 @@
                 name="program_code"
                 required
               >
+                <option value="" disabled selected>Select a program</option>
                 {% for program in programs %}
                 <option value="{{ program.code }}">{{ program.code }}</option>
                 {% endfor %}
@@ -131,6 +134,7 @@
                 name="year_level"
                 required
               >
+                <option value="" disabled selected>Select year level</option>
                 <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
@@ -140,6 +144,7 @@
             <div class="mb-3">
               <label for="gender" class="form-label">Gender:</label>
               <select class="form-select" id="gender" name="gender" required>
+                <option value="" disabled selected>Select gender</option>
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
               </select>
