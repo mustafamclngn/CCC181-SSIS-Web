@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Blueprint, request, flash, redirect, url_for
+from flask import Flask, render_template, Blueprint, request, flash, redirect, url_for, jsonify
 from app.database import get_db
 
 program_bp = Blueprint("program", __name__, template_folder="templates")
@@ -10,14 +10,12 @@ program_bp = Blueprint("program", __name__, template_folder="templates")
 def programs():
     db = get_db()
 
-    # fetch colleges
     cursor = db.cursor()
     cursor.execute("SELECT collegecode, collegename FROM colleges ORDER BY collegecode ASC")
     colleges_data = cursor.fetchall()
     cursor.close()
     colleges_list = [{"code": c[0], "name": c[1]} for c in colleges_data]
 
-    # fetch programs
     cursor = db.cursor()
     cursor.execute("SELECT programcode, programname, collegecode FROM programs ORDER BY programcode ASC")
     programs_data = cursor.fetchall()
@@ -29,6 +27,36 @@ def programs():
         programs=programs_list,
         colleges=colleges_list
     )
+
+# ========= CHECK IF PROGRAM EXISTS (AJAX) =========
+@program_bp.route("/programs/check", methods=["POST"])
+def check_program():
+    data = request.get_json()
+    code = data.get("code", "").strip().upper()
+    name = data.get("name", "").strip().title()
+    college_code = data.get("college_code", "").strip().upper()
+    original_code = data.get("original_code", "").strip().upper()
+
+    db = get_db()
+    cursor = db.cursor()
+    try:
+        if original_code:
+            cursor.execute(
+                "SELECT COUNT(*) FROM programs WHERE (programcode = %s OR programname = %s) AND programcode != %s",
+                (code, name, original_code)
+            )
+        else:
+            cursor.execute(
+                "SELECT COUNT(*) FROM programs WHERE programcode = %s OR programname = %s",
+                (code, name)
+            )
+        
+        exists = cursor.fetchone()[0] > 0
+        return jsonify({"exists": exists})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        cursor.close()
 
 # ==============================
 # REGISTER PROGRAM

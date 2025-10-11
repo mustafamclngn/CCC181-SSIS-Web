@@ -1,7 +1,68 @@
+// toast notification
+function showToast(message, type = "error") {
+  const colors = {
+    error: "#dc3545",
+    warning: "#ffc107",
+    success: "#28a745",
+    info: "#17a2b8",
+    danger: "#dc3545",
+  };
+
+  const toast = document.createElement("div");
+  toast.className = "toast-notification";
+  toast.style.backgroundColor = colors[type] || colors.error;
+  toast.textContent = message;
+
+  const container = document.getElementById("toastContainer");
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.animation = "slideOut 0.3s ease-out";
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
+}
+
+// flash messages to toast
+document.addEventListener("DOMContentLoaded", function () {
+  const flashMessages = document.querySelectorAll(".alert");
+  flashMessages.forEach((alert) => {
+    const type = alert.classList.contains("alert-success")
+      ? "success"
+      : alert.classList.contains("alert-warning")
+      ? "warning"
+      : alert.classList.contains("alert-info")
+      ? "info"
+      : alert.classList.contains("alert-danger")
+      ? "error"
+      : "error";
+    const message = alert.textContent.trim();
+    showToast(message, type);
+    alert.remove();
+  });
+});
+
 $(document).ready(function () {
   $("#data-table").DataTable();
 
-  // Sidebar
+  // Sidebar Toggle
+  const toggleBtn = document.getElementById("toggle-btn");
+  const sidebar = document.getElementById("sidebar");
+
+  if (toggleBtn && sidebar) {
+    const sidebarState = sessionStorage.getItem("sidebarCollapsed");
+    if (sidebarState === "true") {
+      sidebar.classList.add("collapsed");
+    }
+
+    document.documentElement.classList.remove("sidebar-collapsed-init");
+    toggleBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      sidebar.classList.toggle("collapsed");
+      const isCollapsed = sidebar.classList.contains("collapsed");
+      sessionStorage.setItem("sidebarCollapsed", isCollapsed);
+    });
+  }
   const currentPath = window.location.pathname;
 
   document.querySelectorAll("#sidebar .nav-link").forEach((link) => {
@@ -12,54 +73,64 @@ $(document).ready(function () {
     }
   });
 
-  // Sidebar Toggle
-  const toggleBtn = document.getElementById("toggle-btn");
-  const sidebar = document.getElementById("sidebar");
-  if (toggleBtn && sidebar) {
-    toggleBtn.addEventListener("click", () => {
-      sidebar.classList.toggle("collapsed");
-    });
-  }
-
   // ================================
   // COLLEGE PAGE
   // ================================
 
-  // ================================
   // REGISTER
-  // ================================
-
-  // register college code restriction
+  // college code restriction
   $("#collegeCode").on("input", function () {
     this.value = this.value.replace(/[^A-Za-z]/g, "");
   });
 
-  // register college name restriction
+  // college name restriction
   $("#collegeName").on("input", function () {
     this.value = this.value.replace(/[^A-Za-z\s]/g, "");
   });
 
   $("#registerCollegeModal").on("shown.bs.modal", function () {
     const nameField = $("#collegeName");
-    if (!nameField.val().startsWith("College of ")) {
-      nameField.val("College of ");
+    if (!nameField.val().startsWith("College Of ")) {
+      nameField.val("College Of ");
     }
   });
 
   $("#registerCollegeForm").submit(function (e) {
+    e.preventDefault();
+
     const code = $("#collegeCode").val().trim().toUpperCase();
     const name = $("#collegeName").val().trim();
 
     if (!code || !name) {
-      e.preventDefault();
-      alert("Please fill in both College Code and College Name.");
+      showToast(
+        "Please fill in both College Code and College Name.",
+        "warning"
+      );
+      return;
     }
+
+    $.ajax({
+      url: "/colleges/check",
+      method: "POST",
+      contentType: "application/json",
+      data: JSON.stringify({ code: code, name: name }),
+      success: function (response) {
+        if (response.exists) {
+          showToast("College code or name already exists!", "error");
+        } else {
+          e.target.submit();
+        }
+      },
+      error: function () {
+        showToast(
+          "Error checking college existence. Please try again.",
+          "error"
+        );
+      },
+    });
   });
 
-  // ================================
   // EDIT
-  // ================================
-
   $(".btn-edit").click(function (e) {
     e.preventDefault();
 
@@ -85,19 +156,46 @@ $(document).ready(function () {
   });
 
   $("#editForm").submit(function (e) {
-    const code = $("#editCollegeCode").val().trim();
+    e.preventDefault();
+
+    const originalCode = $("#originalCollegeCode").val().trim().toUpperCase();
+    const code = $("#editCollegeCode").val().trim().toUpperCase();
     const name = $("#editCollegeName").val().trim();
 
     if (!code || !name) {
-      e.preventDefault();
-      alert("Please fill in both College Code and College Name.");
+      showToast(
+        "Please fill in both College Code and College Name.",
+        "warning"
+      );
+      return;
     }
+
+    $.ajax({
+      url: "/colleges/check",
+      method: "POST",
+      contentType: "application/json",
+      data: JSON.stringify({
+        code: code,
+        name: name,
+        original_code: originalCode,
+      }),
+      success: function (response) {
+        if (response.exists) {
+          showToast("College code or name already exists!", "error");
+        } else {
+          e.target.submit();
+        }
+      },
+      error: function () {
+        showToast(
+          "Error checking college existence. Please try again.",
+          "error"
+        );
+      },
+    });
   });
 
-  // ================================
   // DELETE
-  // ================================
-
   $(".btn-delete").click(function (e) {
     e.preventDefault();
     const row = $(this).closest("tr");
@@ -111,7 +209,7 @@ $(document).ready(function () {
     const code = $("#deleteCollegeCode").val();
 
     if (!code) {
-      alert("No college selected for deletion.");
+      showToast("No college selected for deletion.", "warning");
       return;
     }
 
@@ -122,10 +220,7 @@ $(document).ready(function () {
   // PROGRAM PAGE
   // ================================
 
-  // ================================
-  // REGISTER
-  // ================================
-
+  //REGISTER
   // program code restriction
   $("#programCode").on("input", function () {
     this.value = this.value.replace(/[^A-Za-z]/g, "");
@@ -138,26 +233,49 @@ $(document).ready(function () {
 
   $("#registerProgramModal").on("shown.bs.modal", function () {
     const nameField = $("#programName");
-    if (!nameField.val().startsWith("Bachelor of Science in ")) {
-      nameField.val("Bachelor of Science in ");
+    if (!nameField.val().startsWith("Bachelor Of ")) {
+      nameField.val("Bachelor Of ");
     }
   });
 
   $("#registerProgramForm").submit(function (e) {
+    e.preventDefault();
+
     const code = $("#programCode").val().trim().toUpperCase();
     const name = $("#programName").val().trim();
-    const college_code = $("#programCollege").val().trim().toUpperCase();
+    const college_code = $("#programCollege").val().trim();
 
     if (!code || !name || !college_code) {
-      e.preventDefault();
-      alert("Please fill in all fields.");
+      showToast("Please fill in all fields.", "warning");
+      return;
     }
+
+    $.ajax({
+      url: "/programs/check",
+      method: "POST",
+      contentType: "application/json",
+      data: JSON.stringify({
+        code: code,
+        name: name,
+        college_code: college_code,
+      }),
+      success: function (response) {
+        if (response.exists) {
+          showToast("Program code or name already exists!", "error");
+        } else {
+          e.target.submit();
+        }
+      },
+      error: function () {
+        showToast(
+          "Error checking program existence. Please try again.",
+          "error"
+        );
+      },
+    });
   });
 
-  // ================================
-  // EDIT
-  // ================================
-
+  //EDIT
   $(".btn-edit").click(function (e) {
     e.preventDefault();
     const row = $(this).closest("tr");
@@ -184,22 +302,50 @@ $(document).ready(function () {
     this.value = this.value.replace(/[^A-Za-z\s]/g, "");
   });
 
-  // edit program form validation before normal submission
+  // edit program form validation
   $("#editProgramForm").submit(function (e) {
-    const code = $("#editProgramCode").val().trim();
+    e.preventDefault();
+
+    const originalCode = $("#editOriginalProgramCode")
+      .val()
+      .trim()
+      .toUpperCase();
+    const code = $("#editProgramCode").val().trim().toUpperCase();
     const name = $("#editProgramName").val().trim();
     const college_code = $("#editProgramCollege").val().trim();
 
     if (!code || !name || !college_code) {
-      e.preventDefault();
-      alert("Please fill in all fields.");
+      showToast("Please fill in all fields.", "warning");
+      return;
     }
+
+    $.ajax({
+      url: "/programs/check",
+      method: "POST",
+      contentType: "application/json",
+      data: JSON.stringify({
+        code: code,
+        name: name,
+        college_code: college_code,
+        original_code: originalCode,
+      }),
+      success: function (response) {
+        if (response.exists) {
+          showToast("Program code or name already exists!", "error");
+        } else {
+          e.target.submit();
+        }
+      },
+      error: function () {
+        showToast(
+          "Error checking program existence. Please try again.",
+          "error"
+        );
+      },
+    });
   });
 
-  // ================================
   // DELETE
-  // ================================
-
   $(".btn-delete").click(function (e) {
     e.preventDefault();
     const row = $(this).closest("tr");
@@ -224,10 +370,7 @@ $(document).ready(function () {
   // STUDENTS PAGE
   // ================================
 
-  // ================================
   // REGISTER
-  // ================================
-
   // student ID restriction
   $("#idNumber").on("input", function () {
     let value = this.value.toUpperCase();
@@ -252,9 +395,10 @@ $(document).ready(function () {
     this.value = this.value.replace(/[^A-Za-z\s]/g, "");
   });
 
-  // register form validation
   $("#registerStudentForm").submit(function (e) {
-    const idNumber = $("#idNumber").val().trim();
+    e.preventDefault();
+
+    const idNumber = $("#idNumber").val().trim().toUpperCase();
     const firstName = $("#firstName").val().trim();
     const lastName = $("#lastName").val().trim();
     const programCode = $("#programCode").val().trim();
@@ -269,16 +413,45 @@ $(document).ready(function () {
       !yearLevel ||
       !gender
     ) {
-      e.preventDefault();
-      alert("Please fill in all fields.");
+      showToast("Please fill in all fields.", "warning");
+      return;
     }
+
+    const idPattern = /^20\d{2}-\d{4}$/;
+    if (!idPattern.test(idNumber)) {
+      showToast(
+        "ID Number must follow the format: 20xx-xxxx (e.g., 2023-0001).",
+        "error"
+      );
+      return;
+    }
+
+    $.ajax({
+      url: "/students/check",
+      method: "POST",
+      contentType: "application/json",
+      data: JSON.stringify({
+        id_number: idNumber,
+        first_name: firstName,
+        last_name: lastName,
+      }),
+      success: function (response) {
+        if (response.exists) {
+          showToast("Student ID already exists!", "error");
+        } else {
+          e.target.submit();
+        }
+      },
+      error: function () {
+        showToast(
+          "Error checking student existence. Please try again.",
+          "error"
+        );
+      },
+    });
   });
 
-  // ================================
   // EDIT
-  // ================================
-
-  // populate edit modal
   $(".btn-edit").click(function (e) {
     e.preventDefault();
     const row = $(this).closest("tr");
@@ -291,7 +464,6 @@ $(document).ready(function () {
     const gender = row.find("td:eq(5)").text().trim();
 
     $("#editOriginalStudentId").val(idNumber);
-    $("#editOriginalStudentProgram").val(programCode);
     $("#editStudentId").val(idNumber);
     $("#editStudentFirstName").val(firstName);
     $("#editStudentLastName").val(lastName);
@@ -302,14 +474,11 @@ $(document).ready(function () {
     $("#editStudentModal").modal("show");
   });
 
-  // edit student ID restriction
-  $("#studentIdInput").on("input", function () {
+  // edit student ID restrictions
+  $("#editStudentId").on("input", function () {
     let value = this.value.toUpperCase();
     value = value.replace(/[^0-9-]/g, "");
 
-    if (!value.startsWith("20")) {
-      value = "20";
-    }
     if (value.length > 4 && value[4] !== "-") {
       value = value.slice(0, 4) + "-" + value.slice(4);
     }
@@ -319,31 +488,26 @@ $(document).ready(function () {
     this.value = value;
   });
 
-  // edit first name restriction
-  $("#studentFirstNameInput").on("input", function () {
+  // edit student first name restriction
+  $("#editStudentFirstName").on("input", function () {
     this.value = this.value.replace(/[^A-Za-z\s]/g, "");
   });
 
-  // edit last name restriction
-  $("#studentLastNameInput").on("input", function () {
+  // edit student last name restriction
+  $("#editStudentLastName").on("input", function () {
     this.value = this.value.replace(/[^A-Za-z\s]/g, "");
   });
 
-  // edit form validation
   $("#editStudentForm").submit(function (e) {
-    const idNumber = $("#studentIdInput").val().trim();
-    const firstName = $("#studentFirstNameInput").val().trim();
-    const lastName = $("#studentLastNameInput").val().trim();
-    const programCode = $("#studentProgramSelect").val().trim();
-    const yearLevel = $("#studentYearLevelSelect").val().trim();
-    const gender = $("#studentGenderSelect").val().trim();
+    e.preventDefault();
 
-    const idPattern = /^20\d{2}-\d{4}$/;
-    if (!idPattern.test(idNumber)) {
-      e.preventDefault();
-      alert("ID Number must follow the format: 20xx-xxxx (e.g., 2023-0001).");
-      return;
-    }
+    const originalId = $("#editOriginalStudentId").val().trim();
+    const idNumber = $("#editStudentId").val().trim().toUpperCase();
+    const firstName = $("#editStudentFirstName").val().trim();
+    const lastName = $("#editStudentLastName").val().trim();
+    const programCode = $("#editStudentProgram").val().trim();
+    const yearLevel = $("#editStudentYearLevel").val().trim();
+    const gender = $("#editStudentGender").val().trim();
 
     if (
       !idNumber ||
@@ -353,15 +517,46 @@ $(document).ready(function () {
       !yearLevel ||
       !gender
     ) {
-      e.preventDefault();
-      alert("Please fill in all fields.");
+      showToast("Please fill in all fields.", "warning");
+      return;
     }
+
+    const idPattern = /^20\d{2}-\d{4}$/;
+    if (!idPattern.test(idNumber)) {
+      showToast(
+        "ID Number must follow the format: 20xx-xxxx (e.g., 2023-0001).",
+        "error"
+      );
+      return;
+    }
+
+    $.ajax({
+      url: "/students/check",
+      method: "POST",
+      contentType: "application/json",
+      data: JSON.stringify({
+        id_number: idNumber,
+        first_name: firstName,
+        last_name: lastName,
+        original_id: originalId,
+      }),
+      success: function (response) {
+        if (response.exists) {
+          showToast("Student ID already exists!", "error");
+        } else {
+          e.target.submit();
+        }
+      },
+      error: function () {
+        showToast(
+          "Error checking student existence. Please try again.",
+          "error"
+        );
+      },
+    });
   });
 
-  // ================================
   // DELETE
-  // ================================
-
   $(".btn-delete").click(function (e) {
     e.preventDefault();
     const row = $(this).closest("tr");

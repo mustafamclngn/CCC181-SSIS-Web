@@ -1,22 +1,14 @@
 {% extends "index.html" %} {% block content %}
 
 <div class="container-fluid p-4 rounded-4 bg-white shadow-sm">
-  <!-- ================== FLASH MESSAGES ================== -->
-  {% with messages = get_flashed_messages(with_categories=true) %} {% if
-  messages %} {% for category, message in messages %}
-  <div
-    class="alert alert-{{ category }} alert-dismissible fade show"
-    role="alert"
-  >
-    {{ message }}
-    <button
-      type="button"
-      class="btn-close"
-      data-bs-dismiss="alert"
-      aria-label="Close"
-    ></button>
+  
+  <!-- flash messages to toast -->
+  <div style="display: none">
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %} {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">{{ message }}</div>
+    {% endfor %} {% endif %} {% endwith %}
   </div>
-  {% endfor %} {% endif %} {% endwith %}
 
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h3>Student Records</h3>
@@ -74,7 +66,11 @@
   >
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
-        <form method="post" action="{{ url_for('student.register_student') }}">
+        <form
+          id="registerStudentForm"
+          method="post"
+          action="{{ url_for('student.register_student') }}"
+        >
           <div class="modal-header">
             <h5 class="modal-title">Register Student</h5>
             <button
@@ -175,7 +171,11 @@
   >
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
-        <form method="post" action="{{ url_for('student.edit_student') }}">
+        <form
+          id="editStudentForm"
+          method="post"
+          action="{{ url_for('student.edit_student') }}"
+        >
           <div class="modal-header">
             <h5 class="modal-title">Edit Student</h5>
             <button

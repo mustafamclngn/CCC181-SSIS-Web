@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Blueprint, request, redirect, url_for, flash
+from flask import Flask, render_template, Blueprint, request, redirect, url_for, flash, jsonify
 from app.database import close_db, get_db
 
 college_bp = Blueprint("college", __name__, template_folder="templates")
@@ -17,6 +17,36 @@ def colleges():
         "colleges.html",
         colleges=colleges_list,
     )
+
+
+# ========= CHECK IF COLLEGE EXISTS (AJAX) =========
+@college_bp.route("/colleges/check", methods=["POST"])
+def check_college():
+    data = request.get_json()
+    code = data.get("code", "").strip().upper()
+    name = data.get("name", "").strip().title()
+    original_code = data.get("original_code", "").strip().upper()
+
+    db = get_db()
+    cursor = db.cursor()
+    try:
+        if original_code:
+            cursor.execute(
+                "SELECT COUNT(*) FROM colleges WHERE (collegecode = %s OR collegename = %s) AND collegecode != %s",
+                (code, name, original_code)
+            )
+        else:
+            cursor.execute(
+                "SELECT COUNT(*) FROM colleges WHERE collegecode = %s OR collegename = %s",
+                (code, name)
+            )
+        
+        exists = cursor.fetchone()[0] > 0
+        return jsonify({"exists": exists})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        cursor.close()
 
 
 # ========= REGISTER COLLEGE =========

@@ -12,7 +12,19 @@ body {
   font-size: 19px;
 }
 
-/* Sidebar */
+/* sidebar */
+.sidebar-collapsed-init #sidebar {
+  width: var(--sidebar-collapsed-width);
+}
+
+.sidebar-collapsed-init #sidebar .sidebar-link span {
+  display: none;
+}
+
+.sidebar-collapsed-init #main-content {
+  margin-left: var(--sidebar-collapsed-width);
+}
+
 #sidebar {
   width: var(--sidebar-width);
   height: 100vh;
@@ -31,13 +43,15 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 12px 40px;
+  padding: 12px 20px;
   text-decoration: none;
   color: #333;
   font-size: 20px;
   transition: 0.3s;
   width: 100%;
   border-radius: 12px;
+  margin: 0 15px;
+  width: calc(100% - 30px);
 }
 
 .sidebar-link:hover,
@@ -50,8 +64,7 @@ body {
   background: #0d6efd;
   color: #fff;
   font-weight: 600;
-  border-left: 5px solid #084298;
-  border-radius: 0 12px 12px 0;
+  border-radius: 12px;
 }
 
 #sidebar nav {
@@ -159,4 +172,44 @@ body.login-page {
 
 .create-account-link:hover {
   text-decoration: underline;
+}
+
+/* toast styles */
+#toastContainer {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+}
+
+.toast-notification {
+  color: white;
+  padding: 15px 20px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  animation: slideIn 0.3s ease-out;
+  min-width: 300px;
 }

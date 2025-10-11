@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Blueprint, request, flash, redirect, url_for
+from flask import Flask, render_template, Blueprint, request, flash, redirect, url_for, jsonify
 from app.database import close_db, get_db
 
 student_bp = Blueprint("student", __name__, template_folder="templates")
@@ -10,14 +10,12 @@ student_bp = Blueprint("student", __name__, template_folder="templates")
 def students():
     db = get_db()
 
-    # fetch programs
     cursor = db.cursor()
     cursor.execute("SELECT programcode, programname FROM programs ORDER BY programname ASC")
     programs_data = cursor.fetchall()
     cursor.close()
     programs_list = [{"code": p[0], "name": p[1]} for p in programs_data]
 
-    # fetch students
     cursor = db.cursor()
     cursor.execute("""
         SELECT idnumber, firstname, lastname, gender, yearlevel, programcode
@@ -44,6 +42,34 @@ def students():
         students=students_list,
         programs=programs_list
     )
+
+# ==============================CHECK IF STUDENT EXISTS (AJAX) =========
+@student_bp.route("/students/check", methods=["POST"])
+def check_student():
+    data = request.get_json()
+    id_number = data.get("id_number", "").strip()
+    original_id = data.get("original_id", "").strip()
+
+    db = get_db()
+    cursor = db.cursor()
+    try:
+        if original_id:
+            cursor.execute(
+                "SELECT COUNT(*) FROM students WHERE idnumber = %s AND idnumber != %s",
+                (id_number, original_id)
+            )
+        else:
+            cursor.execute(
+                "SELECT COUNT(*) FROM students WHERE idnumber = %s",
+                (id_number,)
+            )
+        
+        exists = cursor.fetchone()[0] > 0
+        return jsonify({"exists": exists})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        cursor.close()
 
 # ==============================
 # REGISTER STUDENT

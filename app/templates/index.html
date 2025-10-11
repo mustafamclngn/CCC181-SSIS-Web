@@ -3,6 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <script>
+      if (sessionStorage.getItem("sidebarCollapsed") === "true") {
+        document.documentElement.classList.add("sidebar-collapsed-init");
+      }
+    </script>
+
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='styles.css') }}"
@@ -134,28 +141,8 @@
       </div>
     </div>
 
-    <!-- Toast Container -->
-    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
-      <div
-        id="mainToast"
-        class="toast align-items-center text-bg-success border-0"
-        role="alert"
-        aria-live="assertive"
-        aria-atomic="true"
-      >
-        <div class="d-flex">
-          <div id="mainToastMessage" class="toast-body">
-            Success message here!
-          </div>
-          <button
-            type="button"
-            class="btn-close btn-close-white me-2 m-auto"
-            data-bs-dismiss="toast"
-            aria-label="Close"
-          ></button>
-        </div>
-      </div>
-    </div>
+    <!-- toast container -->
+    <div id="toastContainer"></div>
 
     <!-- jquery -->
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
