@@ -131,7 +131,7 @@ $(document).ready(function () {
   });
 
   // EDIT
-  $(".btn-edit").click(function (e) {
+  $(document).on("click", ".btn-edit", function (e) {
     e.preventDefault();
 
     const row = $(this).closest("tr");
@@ -196,7 +196,7 @@ $(document).ready(function () {
   });
 
   // DELETE
-  $(".btn-delete").click(function (e) {
+  $(document).on("click", ".btn-delete", function (e) {
     e.preventDefault();
     const row = $(this).closest("tr");
     const code = row.find("td:eq(0)").text().trim();
@@ -276,7 +276,7 @@ $(document).ready(function () {
   });
 
   //EDIT
-  $(".btn-edit").click(function (e) {
+  $(document).on("click", ".btn-edit", function (e) {
     e.preventDefault();
     const row = $(this).closest("tr");
 
@@ -346,7 +346,7 @@ $(document).ready(function () {
   });
 
   // DELETE
-  $(".btn-delete").click(function (e) {
+  $(document).on("click", ".btn-delete", function (e) {
     e.preventDefault();
     const row = $(this).closest("tr");
     const programCode = row.find("td:eq(0)").text().trim();
@@ -452,7 +452,7 @@ $(document).ready(function () {
   });
 
   // EDIT
-  $(".btn-edit").click(function (e) {
+  $(document).on("click", ".btn-edit", function (e) {
     e.preventDefault();
     const row = $(this).closest("tr");
 
@@ -557,7 +557,7 @@ $(document).ready(function () {
   });
 
   // DELETE
-  $(".btn-delete").click(function (e) {
+  $(document).on("click", ".btn-delete", function (e) {
     e.preventDefault();
     const row = $(this).closest("tr");
     const studentId = row.find("td:eq(0)").text().trim();
