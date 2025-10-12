@@ -44,6 +44,31 @@ def dashboard():
         """)
         top_programs = cursor.fetchall()
 
+        # college statistics
+        cursor.execute("""
+            SELECT 
+                c.collegename AS name,
+                c.collegecode AS code,
+                COUNT(DISTINCT p.programcode) AS program_count,
+                COUNT(DISTINCT s.idnumber) AS student_count
+            FROM colleges c
+            LEFT JOIN programs p ON c.collegecode = p.collegecode
+            LEFT JOIN students s ON p.programcode = s.programcode
+            GROUP BY c.collegecode, c.collegename
+            ORDER BY c.collegename;
+        """)
+        college_statistics_raw = cursor.fetchall()
+        
+        college_statistics = [
+            {
+                'name': row[0],
+                'code': row[1],
+                'program_count': row[2],
+                'student_count': row[3]
+            }
+            for row in college_statistics_raw
+        ]
+
     finally:
         cursor.close()
 
@@ -54,4 +79,5 @@ def dashboard():
         total_students=total_students,
         top_colleges=top_colleges,
         top_programs=top_programs,
+        college_statistics=college_statistics,
     )

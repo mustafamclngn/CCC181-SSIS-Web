@@ -53,9 +53,7 @@
   <!-- top 5 colleges -->
   <div class="col-md-6 mb-4">
     <div class="card shadow-sm rounded-3">
-      <div class="card-header bg-primary text-white fw-bold">
-        Top 5 Colleges with Most Students
-      </div>
+      <div class="card-header fw-bold">Top 5 Colleges with Most Students</div>
       <div class="card-body p-0">
         <table class="table table-striped mb-0">
           <thead class="table-light">
@@ -86,9 +84,7 @@
   <!-- top 5 programs -->
   <div class="col-md-6 mb-4">
     <div class="card shadow-sm rounded-3">
-      <div class="card-header bg-success text-white fw-bold">
-        Top 5 Programs with Most Students
-      </div>
+      <div class="card-header fw-bold">Top 5 Programs with Most Students</div>
       <div class="card-body p-0">
         <table class="table table-striped mb-0">
           <thead class="table-light">
@@ -112,6 +108,45 @@
             {% endfor %}
           </tbody>
         </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- college statistics table -->
+<div class="row">
+  <div class="col-12 mb-4">
+    <div class="card shadow-sm rounded-3">
+      <div class="card-header fw-bold">College Statistics</div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table id="dashboard-table" class="table table-striped mb-0">
+            <thead class="table-light">
+              <tr>
+                <th scope="col">College Name</th>
+                <th scope="col">College Code</th>
+                <th scope="col" class="text-center">Programs</th>
+                <th scope="col" class="text-center">Students</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for college in college_statistics %}
+              <tr>
+                <td>{{ college.name }}</td>
+                <td>{{ college.code }}</td>
+                <td class="text-center">{{ college.program_count }}</td>
+                <td class="text-center">{{ college.student_count }}</td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="4" class="text-center text-muted py-3">
+                  No data available
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>

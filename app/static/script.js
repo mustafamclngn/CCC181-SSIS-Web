@@ -46,6 +46,10 @@ $(document).ready(function () {
     pageLength: 15,
     lengthMenu: [15, 25, 35],
   });
+  $("#dashboard-table").DataTable({
+    pageLength: 5,
+    lengthMenu: [5, 10, 15],
+  });
 
   // Sidebar Toggle
   const toggleBtn = document.getElementById("toggle-btn");

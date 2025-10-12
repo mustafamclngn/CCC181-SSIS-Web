@@ -122,15 +122,33 @@ table td:last-child {
   font-size: 1.2rem;
 }
 
+/* count cards */
 .count-card {
   transition: transform 0.2s ease, box-shadow 0.2s ease,
     background-color 0.3s ease;
   cursor: pointer;
+  border-left: 4px solid transparent;
+  background: #ffffff;
 }
 
 .count-card:hover {
   background-color: #0d6efd;
   color: #fff;
+  border-left-color: #ffffff;
+}
+
+.count-card h2 {
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+.count-card i {
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.count-card:hover i {
+  opacity: 1;
 }
 
 body.login-page {
@@ -212,4 +230,35 @@ body.login-page {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   animation: slideIn 0.3s ease-out;
   min-width: 300px;
+}
+
+/* ========== DASHBOARD UX IMPROVEMENTS ========== */
+
+/* Table improvements */
+.table {
+  margin-bottom: 0;
+}
+
+.table th {
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #495057;
+  border-bottom: 2px solid #dee2e6;
+}
+
+/* Better empty state */
+.text-muted.py-3 {
+  font-style: italic;
+  color: #adb5bd !important;
+}
+
+/* Spacing improvements */
+.mb-4 {
+  margin-bottom: 1.5rem !important;
+}
+
+.rounded-3 {
+  border-radius: 0.5rem !important;
 }
