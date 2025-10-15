@@ -1,22 +1,12 @@
 from flask import Flask, render_template, Blueprint, request, redirect, url_for, flash, jsonify
-from app.database import close_db, get_db
+from app.models.colleges import CollegeModel
 
 college_bp = Blueprint("college", __name__, template_folder="templates")
 
 @college_bp.route("/colleges")
 def colleges():
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute("SELECT * FROM colleges ORDER BY collegecode ASC")
-    colleges_data = cursor.fetchall()
-    cursor.close()
-
-    colleges_list = [{"collegecode": c[0], "collegename": c[1]} for c in colleges_data]
-
-    return render_template(
-        "colleges.html",
-        colleges=colleges_list,
-    )
+    colleges_list = CollegeModel.get_all_colleges()
+    return render_template("colleges.html", colleges=colleges_list)
 
 
 # ========= CHECK IF COLLEGE EXISTS (AJAX) =========
@@ -27,26 +17,11 @@ def check_college():
     name = data.get("name", "").strip().title()
     original_code = data.get("original_code", "").strip().upper()
 
-    db = get_db()
-    cursor = db.cursor()
     try:
-        if original_code:
-            cursor.execute(
-                "SELECT COUNT(*) FROM colleges WHERE (collegecode = %s OR collegename = %s) AND collegecode != %s",
-                (code, name, original_code)
-            )
-        else:
-            cursor.execute(
-                "SELECT COUNT(*) FROM colleges WHERE collegecode = %s OR collegename = %s",
-                (code, name)
-            )
-        
-        exists = cursor.fetchone()[0] > 0
+        exists = CollegeModel.check_college_exists(code, name, original_code if original_code else None)
         return jsonify({"exists": exists})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    finally:
-        cursor.close()
 
 
 # ========= REGISTER COLLEGE =========
@@ -59,24 +34,17 @@ def register_college():
         flash("All fields are required.", "danger")
         return redirect(url_for("college.colleges"))
 
-    db = get_db()
-    cursor = db.cursor()
     try:
-        cursor.execute("SELECT COUNT(*) FROM colleges WHERE collegecode = %s OR collegename = %s", (code, name))
-        if cursor.fetchone()[0] > 0:
+        if CollegeModel.check_college_exists(code, name):
             flash("College code or name already exists.", "warning")
             return redirect(url_for("college.colleges"))
 
-        cursor.execute("INSERT INTO colleges (collegecode, collegename) VALUES (%s, %s)", (code, name))
-        db.commit()
+        CollegeModel.create_college(code, name)
         flash("College registered successfully!", "success")
         return redirect(url_for("college.colleges"))
     except Exception as e:
-        db.rollback()
         flash(f"Error: {str(e)}", "danger")
         return redirect(url_for("college.colleges"))
-    finally:
-        cursor.close()
 
 
 # ========= EDIT COLLEGE =========
@@ -90,30 +58,17 @@ def edit_college():
         flash("All fields are required.", "danger")
         return redirect(url_for("college.colleges"))
 
-    db = get_db()
-    cursor = db.cursor()
     try:
-        cursor.execute(
-            "SELECT COUNT(*) FROM colleges WHERE (collegecode = %s OR collegename = %s) AND collegecode != %s",
-            (new_code, new_name, original_code)
-        )
-        if cursor.fetchone()[0] > 0:
+        if CollegeModel.check_college_exists(new_code, new_name, original_code):
             flash("College code or name already exists.", "warning")
             return redirect(url_for("college.colleges"))
 
-        cursor.execute(
-            "UPDATE colleges SET collegecode = %s, collegename = %s WHERE collegecode = %s",
-            (new_code, new_name, original_code)
-        )
-        db.commit()
+        CollegeModel.update_college(original_code, new_code, new_name)
         flash("College updated successfully!", "success")
         return redirect(url_for("college.colleges"))
     except Exception as e:
-        db.rollback()
         flash(f"Error: {str(e)}", "danger")
         return redirect(url_for("college.colleges"))
-    finally:
-        cursor.close()
 
 
 # ========= DELETE COLLEGE =========
@@ -125,16 +80,10 @@ def delete_college():
         flash("College code is missing!", "danger")
         return redirect(url_for("college.colleges"))
 
-    db = get_db()
-    cursor = db.cursor()
     try:
-        cursor.execute("DELETE FROM colleges WHERE collegecode = %s", (code,))
-        db.commit()
+        CollegeModel.delete_college(code)
         flash("College deleted successfully!", "success")
         return redirect(url_for("college.colleges"))
     except Exception as e:
-        db.rollback()
         flash(f"Error: {str(e)}", "danger")
         return redirect(url_for("college.colleges"))
-    finally:
-        cursor.close()

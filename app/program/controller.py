@@ -1,5 +1,5 @@
 from flask import Flask, render_template, Blueprint, request, flash, redirect, url_for, jsonify
-from app.database import get_db
+from app.models.programs import ProgramModel
 
 program_bp = Blueprint("program", __name__, template_folder="templates")
 
@@ -8,19 +8,8 @@ program_bp = Blueprint("program", __name__, template_folder="templates")
 # ==============================
 @program_bp.route("/programs")
 def programs():
-    db = get_db()
-
-    cursor = db.cursor()
-    cursor.execute("SELECT collegecode, collegename FROM colleges ORDER BY collegecode ASC")
-    colleges_data = cursor.fetchall()
-    cursor.close()
-    colleges_list = [{"code": c[0], "name": c[1]} for c in colleges_data]
-
-    cursor = db.cursor()
-    cursor.execute("SELECT programcode, programname, collegecode FROM programs ORDER BY programcode ASC")
-    programs_data = cursor.fetchall()
-    cursor.close()
-    programs_list = [{"code": p[0], "name": p[1], "college_code": p[2]} for p in programs_data]
+    colleges_list = ProgramModel.get_all_colleges()
+    programs_list = ProgramModel.get_all_programs()
 
     return render_template(
         "programs.html",
@@ -28,35 +17,21 @@ def programs():
         colleges=colleges_list
     )
 
+
 # ========= CHECK IF PROGRAM EXISTS (AJAX) =========
 @program_bp.route("/programs/check", methods=["POST"])
 def check_program():
     data = request.get_json()
     code = data.get("code", "").strip().upper()
     name = data.get("name", "").strip().title()
-    college_code = data.get("college_code", "").strip().upper()
     original_code = data.get("original_code", "").strip().upper()
 
-    db = get_db()
-    cursor = db.cursor()
     try:
-        if original_code:
-            cursor.execute(
-                "SELECT COUNT(*) FROM programs WHERE (programcode = %s OR programname = %s) AND programcode != %s",
-                (code, name, original_code)
-            )
-        else:
-            cursor.execute(
-                "SELECT COUNT(*) FROM programs WHERE programcode = %s OR programname = %s",
-                (code, name)
-            )
-        
-        exists = cursor.fetchone()[0] > 0
+        exists = ProgramModel.check_program_exists(code, name, original_code if original_code else None)
         return jsonify({"exists": exists})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    finally:
-        cursor.close()
+
 
 # ==============================
 # REGISTER PROGRAM
@@ -71,30 +46,18 @@ def register_program():
         flash("All fields are required.", "danger")
         return redirect(url_for("program.programs"))
 
-    db = get_db()
-    cursor = db.cursor()
     try:
-        cursor.execute(
-            "SELECT COUNT(*) FROM programs WHERE programcode = %s OR programname = %s",
-            (program_code, program_name)
-        )
-        if cursor.fetchone()[0] > 0:
+        if ProgramModel.check_program_exists(program_code, program_name):
             flash("Program code or name already exists.", "warning")
             return redirect(url_for("program.programs"))
 
-        cursor.execute(
-            "INSERT INTO programs (programcode, programname, collegecode) VALUES (%s, %s, %s)",
-            (program_code, program_name, college_code)
-        )
-        db.commit()
+        ProgramModel.create_program(program_code, program_name, college_code)
         flash("Program registered successfully!", "success")
         return redirect(url_for("program.programs"))
     except Exception as e:
-        db.rollback()
         flash(f"Error: {str(e)}", "danger")
         return redirect(url_for("program.programs"))
-    finally:
-        cursor.close()
+
 
 # ==============================
 # EDIT PROGRAM
@@ -110,40 +73,18 @@ def edit_program():
         flash("All fields are required.", "danger")
         return redirect(url_for("program.programs"))
 
-    db = get_db()
-    cursor = db.cursor()
     try:
-        cursor.execute(
-            """
-            SELECT COUNT(*) FROM programs
-            WHERE (programcode = %s OR programname = %s)
-              AND programcode != %s
-            """,
-            (new_code, new_name, original_code)
-        )
-        if cursor.fetchone()[0] > 0:
+        if ProgramModel.check_program_exists(new_code, new_name, original_code):
             flash("Program code or name already exists.", "warning")
             return redirect(url_for("program.programs"))
 
-        cursor.execute(
-            """
-            UPDATE programs
-            SET programcode = %s,
-                programname = %s,
-                collegecode = %s
-            WHERE programcode = %s
-            """,
-            (new_code, new_name, new_college_code, original_code)
-        )
-        db.commit()
+        ProgramModel.update_program(original_code, new_code, new_name, new_college_code)
         flash("Program updated successfully!", "success")
         return redirect(url_for("program.programs"))
     except Exception as e:
-        db.rollback()
         flash(f"Error: {str(e)}", "danger")
         return redirect(url_for("program.programs"))
-    finally:
-        cursor.close()
+
 
 # ==============================
 # DELETE PROGRAM
@@ -156,16 +97,10 @@ def delete_program():
         flash("Program code is missing!", "danger")
         return redirect(url_for("program.programs"))
 
-    db = get_db()
-    cursor = db.cursor()
     try:
-        cursor.execute("DELETE FROM programs WHERE programcode = %s", (code,))
-        db.commit()
+        ProgramModel.delete_program(code)
         flash("Program deleted successfully!", "success")
         return redirect(url_for("program.programs"))
     except Exception as e:
-        db.rollback()
         flash(f"Error: {str(e)}", "danger")
         return redirect(url_for("program.programs"))
-    finally:
-        cursor.close()

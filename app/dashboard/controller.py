@@ -1,76 +1,19 @@
 from flask import Flask, render_template, Blueprint, request, flash, redirect, url_for
-from app.database import close_db, get_db
+from app.models.dashboard import DashboardModel
 
 dashboard_bp = Blueprint("dashboard", __name__, template_folder="templates")
 
+# ==============================
+# DASHBOARD
+# ==============================
 @dashboard_bp.route("/dashboard")
 def dashboard():
-    db = get_db()
-    cursor = db.cursor()
-
-    try:
-        # count registered colleges
-        cursor.execute("SELECT COUNT(*) FROM colleges")
-        total_colleges = cursor.fetchone()[0]
-
-        # count registered programs
-        cursor.execute("SELECT COUNT(*) FROM programs")
-        total_programs = cursor.fetchone()[0]
-
-        # count registered students
-        cursor.execute("SELECT COUNT(*) FROM students")
-        total_students = cursor.fetchone()[0]
-
-        # top 5 registered students in college count
-        cursor.execute("""
-            SELECT c.collegename, COUNT(s.idnumber) AS student_count
-            FROM colleges c
-            LEFT JOIN programs p ON c.collegecode = p.collegecode
-            LEFT JOIN students s ON p.programcode = s.programcode
-            GROUP BY c.collegename
-            ORDER BY student_count DESC
-            LIMIT 5;
-        """)
-        top_colleges = cursor.fetchall()
-
-        # top 5 registered students in program count
-        cursor.execute("""
-            SELECT p.programname, COUNT(s.idnumber) AS student_count
-            FROM programs p
-            LEFT JOIN students s ON p.programcode = s.programcode
-            GROUP BY p.programname
-            ORDER BY student_count DESC
-            LIMIT 5;
-        """)
-        top_programs = cursor.fetchall()
-
-        # college statistics
-        cursor.execute("""
-            SELECT 
-                c.collegename AS name,
-                c.collegecode AS code,
-                COUNT(DISTINCT p.programcode) AS program_count,
-                COUNT(DISTINCT s.idnumber) AS student_count
-            FROM colleges c
-            LEFT JOIN programs p ON c.collegecode = p.collegecode
-            LEFT JOIN students s ON p.programcode = s.programcode
-            GROUP BY c.collegecode, c.collegename
-            ORDER BY c.collegename;
-        """)
-        college_statistics_raw = cursor.fetchall()
-        
-        college_statistics = [
-            {
-                'name': row[0],
-                'code': row[1],
-                'program_count': row[2],
-                'student_count': row[3]
-            }
-            for row in college_statistics_raw
-        ]
-
-    finally:
-        cursor.close()
+    total_colleges = DashboardModel.get_total_colleges()
+    total_programs = DashboardModel.get_total_programs()
+    total_students = DashboardModel.get_total_students()
+    top_colleges = DashboardModel.get_top_colleges(limit=5)
+    top_programs = DashboardModel.get_top_programs(limit=5)
+    college_statistics = DashboardModel.get_college_statistics()
 
     return render_template(
         "dashboard.html",

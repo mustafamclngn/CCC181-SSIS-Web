@@ -1,5 +1,5 @@
 from flask import Flask, render_template, Blueprint, request, flash, redirect, url_for, jsonify
-from app.database import close_db, get_db
+from app.models.students import StudentModel
 
 student_bp = Blueprint("student", __name__, template_folder="templates")
 
@@ -8,33 +8,8 @@ student_bp = Blueprint("student", __name__, template_folder="templates")
 # ==============================
 @student_bp.route("/students")
 def students():
-    db = get_db()
-
-    cursor = db.cursor()
-    cursor.execute("SELECT programcode, programname FROM programs ORDER BY programname ASC")
-    programs_data = cursor.fetchall()
-    cursor.close()
-    programs_list = [{"code": p[0], "name": p[1]} for p in programs_data]
-
-    cursor = db.cursor()
-    cursor.execute("""
-        SELECT idnumber, firstname, lastname, gender, yearlevel, programcode
-        FROM students
-        ORDER BY lastname, firstname
-    """)
-    students_data = cursor.fetchall()
-    cursor.close()
-    students_list = [
-        {
-            "id_number": s[0],
-            "first_name": s[1],
-            "last_name": s[2],
-            "gender": s[3],
-            "year_level": s[4],
-            "program_code": s[5],
-        }
-        for s in students_data
-    ]
+    programs_list = StudentModel.get_all_programs()
+    students_list = StudentModel.get_all_students()
 
     return render_template(
         "students.html",
@@ -43,33 +18,20 @@ def students():
         programs=programs_list
     )
 
-# ==============================CHECK IF STUDENT EXISTS (AJAX) =========
+# ==============================
+# CHECK IF STUDENT EXISTS (AJAX)
+# ==============================
 @student_bp.route("/students/check", methods=["POST"])
 def check_student():
     data = request.get_json()
     id_number = data.get("id_number", "").strip()
     original_id = data.get("original_id", "").strip()
 
-    db = get_db()
-    cursor = db.cursor()
     try:
-        if original_id:
-            cursor.execute(
-                "SELECT COUNT(*) FROM students WHERE idnumber = %s AND idnumber != %s",
-                (id_number, original_id)
-            )
-        else:
-            cursor.execute(
-                "SELECT COUNT(*) FROM students WHERE idnumber = %s",
-                (id_number,)
-            )
-        
-        exists = cursor.fetchone()[0] > 0
+        exists = StudentModel.check_student_exists(id_number, original_id if original_id else None)
         return jsonify({"exists": exists})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    finally:
-        cursor.close()
 
 # ==============================
 # REGISTER STUDENT
@@ -87,28 +49,15 @@ def register_student():
         flash("All fields are required.", "danger")
         return redirect(url_for("student.students"))
 
-    db = get_db()
-    cursor = db.cursor()
     try:
-        cursor.execute("SELECT idnumber FROM students WHERE idnumber = %s", (id_number,))
-        if cursor.fetchone():
+        if StudentModel.check_student_exists(id_number):
             flash("Student ID already exists.", "warning")
             return redirect(url_for("student.students"))
 
-        cursor.execute(
-            """
-            INSERT INTO students (idnumber, firstname, lastname, gender, yearlevel, programcode)
-            VALUES (%s, %s, %s, %s, %s, %s)
-            """,
-            (id_number, first_name, last_name, gender, year_level, program_code)
-        )
-        db.commit()
+        StudentModel.create_student(id_number, first_name, last_name, gender, year_level, program_code)
         flash("Student registered successfully!", "success")
     except Exception as e:
-        db.rollback()
         flash(f"Error: {str(e)}", "danger")
-    finally:
-        cursor.close()
 
     return redirect(url_for("student.students"))
 
@@ -129,37 +78,15 @@ def edit_student():
         flash("All fields are required.", "danger")
         return redirect(url_for("student.students"))
 
-    db = get_db()
-    cursor = db.cursor()
     try:
-        cursor.execute(
-            "SELECT idnumber FROM students WHERE idnumber = %s AND idnumber != %s",
-            (id_number, original_id)
-        )
-        if cursor.fetchone():
+        if StudentModel.check_student_exists(id_number, original_id):
             flash("A student with this ID already exists.", "warning")
             return redirect(url_for("student.students"))
 
-        cursor.execute(
-            """
-            UPDATE students
-            SET idnumber = %s,
-                firstname = %s,
-                lastname = %s,
-                gender = %s,
-                yearlevel = %s,
-                programcode = %s
-            WHERE idnumber = %s
-            """,
-            (id_number, first_name, last_name, gender, year_level, program_code, original_id)
-        )
-        db.commit()
+        StudentModel.update_student(original_id, id_number, first_name, last_name, gender, year_level, program_code)
         flash("Student updated successfully!", "success")
     except Exception as e:
-        db.rollback()
         flash(f"Error: {str(e)}", "danger")
-    finally:
-        cursor.close()
 
     return redirect(url_for("student.students"))
 
@@ -168,22 +95,16 @@ def edit_student():
 # ==============================
 @student_bp.route("/students/delete", methods=["POST"])
 def delete_student():
-    student_id = request.form.get("id_number", "").strip()
+    id_number = request.form.get("id_number", "").strip()
 
-    if not student_id:
+    if not id_number:
         flash("Student ID is required!", "danger")
         return redirect(url_for("student.students"))
 
-    db = get_db()
-    cursor = db.cursor()
     try:
-        cursor.execute("DELETE FROM students WHERE idnumber = %s", (student_id,))
-        db.commit()
+        StudentModel.delete_student(id_number)
         flash("Student deleted successfully!", "success")
     except Exception as e:
-        db.rollback()
         flash(f"Error: {str(e)}", "danger")
-    finally:
-        cursor.close()
 
     return redirect(url_for("student.students"))
