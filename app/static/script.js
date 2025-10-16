@@ -1,23 +1,14 @@
 // toast notification
 function showToast(message, type = "error") {
-  const colors = {
-    error: "#dc3545",
-    warning: "#ffc107",
-    success: "#28a745",
-    info: "#17a2b8",
-    danger: "#dc3545",
-  };
-
   const toast = document.createElement("div");
-  toast.className = "toast-notification";
-  toast.style.backgroundColor = colors[type] || colors.error;
+  toast.className = `toast-notification ${type}`;
   toast.textContent = message;
 
   const container = document.getElementById("toastContainer");
   container.appendChild(toast);
 
   setTimeout(() => {
-    toast.style.animation = "slideOut 0.3s ease-out";
+    toast.classList.add("hiding");
     setTimeout(() => toast.remove(), 300);
   }, 4000);
 }
@@ -42,14 +33,92 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 $(document).ready(function () {
-  $("#data-table").DataTable({
+  const dataTable = $("#data-table").DataTable({
     pageLength: 15,
-    lengthMenu: [15, 25, 35],
+    lengthChange: false,
+    searching: true,
+    dom: '<"row"<"col-sm-12"tr>><"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7 d-flex justify-content-end"p>>',
   });
-  $("#dashboard-table").DataTable({
+
+  const dashboardTable = $("#dashboard-table").DataTable({
     pageLength: 5,
-    lengthMenu: [5, 10, 15],
+    lengthChange: false,
   });
+
+  // college search
+  const searchColumnCollege = $("#searchByColumnCollege");
+  const searchInputCollege = $("#customSearchCollege");
+
+  if (searchColumnCollege.length && searchInputCollege.length && dataTable) {
+    searchInputCollege.on("keyup", function () {
+      const searchValue = this.value;
+      const columnIndex = parseInt(searchColumnCollege.val());
+      dataTable.search("");
+      dataTable.columns().search("");
+      if (columnIndex === -1) {
+        dataTable.search(searchValue).draw();
+      } else {
+        dataTable.column(columnIndex).search(searchValue).draw();
+      }
+    });
+
+    searchColumnCollege.on("change", function () {
+      dataTable.search("");
+      dataTable.columns().search("");
+      searchInputCollege.val("");
+      dataTable.draw();
+    });
+  }
+
+  // program search
+  const searchColumnProgram = $("#searchByColumnProgram");
+  const searchInputProgram = $("#customSearchProgram");
+
+  if (searchColumnProgram.length && searchInputProgram.length && dataTable) {
+    searchInputProgram.on("keyup", function () {
+      const searchValue = this.value;
+      const columnIndex = parseInt(searchColumnProgram.val());
+      dataTable.search("");
+      dataTable.columns().search("");
+      if (columnIndex === -1) {
+        dataTable.search(searchValue).draw();
+      } else {
+        dataTable.column(columnIndex).search(searchValue).draw();
+      }
+    });
+
+    searchColumnProgram.on("change", function () {
+      dataTable.search("");
+      dataTable.columns().search("");
+      searchInputProgram.val("");
+      dataTable.draw();
+    });
+  }
+
+  // student search
+  const searchColumnStudent = $("#searchByColumnStudent");
+  const searchInputStudent = $("#customSearchStudent");
+
+  if (searchColumnStudent.length && searchInputStudent.length && dataTable) {
+    searchInputStudent.on("keyup", function () {
+      const searchValue = this.value;
+      const columnIndex = parseInt(searchColumnStudent.val());
+      dataTable.search("");
+      dataTable.columns().search("");
+      if (columnIndex === -1) {
+        dataTable.search(searchValue).draw();
+      } else {
+        dataTable.column(columnIndex).search(searchValue).draw();
+      }
+    });
+
+    searchColumnStudent.on("change", function () {
+      dataTable.search("");
+      dataTable.columns().search("");
+      searchInputStudent.val("");
+      dataTable.draw();
+    });
+  }
 
   // Sidebar Toggle
   const toggleBtn = document.getElementById("toggle-btn");
@@ -85,12 +154,10 @@ $(document).ready(function () {
   // ================================
 
   // REGISTER
-  // college code restriction
   $("#collegeCode").on("input", function () {
     this.value = this.value.replace(/[^A-Za-z]/g, "");
   });
 
-  // college name restriction
   $("#collegeName").on("input", function () {
     this.value = this.value.replace(/[^A-Za-z\s]/g, "");
   });
@@ -152,12 +219,10 @@ $(document).ready(function () {
     $("#editCollegeModal").modal("show");
   });
 
-  // edit college code restriction
   $("#editCollegeCode").on("input", function () {
     this.value = this.value.replace(/[^A-Za-z]/g, "");
   });
 
-  // edit college name restriction
   $("#editCollegeName").on("input", function () {
     this.value = this.value.replace(/[^A-Za-z\s]/g, "");
   });
@@ -228,12 +293,10 @@ $(document).ready(function () {
   // ================================
 
   //REGISTER
-  // program code restriction
   $("#programCode").on("input", function () {
     this.value = this.value.replace(/[^A-Za-z]/g, "");
   });
 
-  // program name restriction
   $("#programName").on("input", function () {
     this.value = this.value.replace(/[^A-Za-z\s]/g, "");
   });
@@ -299,17 +362,14 @@ $(document).ready(function () {
     $("#editProgramModal").modal("show");
   });
 
-  // edit program code restriction
   $("#editProgramCode").on("input", function () {
     this.value = this.value.replace(/[^A-Za-z]/g, "");
   });
 
-  // edit program name restriction
   $("#editProgramName").on("input", function () {
     this.value = this.value.replace(/[^A-Za-z\s]/g, "");
   });
 
-  // edit program form validation
   $("#editProgramForm").submit(function (e) {
     e.preventDefault();
 
@@ -378,7 +438,6 @@ $(document).ready(function () {
   // ================================
 
   // REGISTER
-  // student ID restriction
   $("#idNumber").on("input", function () {
     let value = this.value.toUpperCase();
     value = value.replace(/[^0-9-]/g, "");
@@ -392,12 +451,10 @@ $(document).ready(function () {
     this.value = value;
   });
 
-  // student first name restriction
   $("#firstName").on("input", function () {
     this.value = this.value.replace(/[^A-Za-z\s]/g, "");
   });
 
-  // student last name restriction
   $("#lastName").on("input", function () {
     this.value = this.value.replace(/[^A-Za-z\s]/g, "");
   });
@@ -481,7 +538,6 @@ $(document).ready(function () {
     $("#editStudentModal").modal("show");
   });
 
-  // edit student ID restrictions
   $("#editStudentId").on("input", function () {
     let value = this.value.toUpperCase();
     value = value.replace(/[^0-9-]/g, "");
@@ -495,12 +551,10 @@ $(document).ready(function () {
     this.value = value;
   });
 
-  // edit student first name restriction
   $("#editStudentFirstName").on("input", function () {
     this.value = this.value.replace(/[^A-Za-z\s]/g, "");
   });
 
-  // edit student last name restriction
   $("#editStudentLastName").on("input", function () {
     this.value = this.value.replace(/[^A-Za-z\s]/g, "");
   });
