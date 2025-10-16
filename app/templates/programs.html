@@ -24,6 +24,27 @@
     </a>
   </div>
 
+  <!-- search -->
+  <div class="row mb-3">
+    <div class="col-md-3">
+      <select id="searchByColumnProgram" class="form-select">
+        <option value="-1">All Columns</option>
+        <option value="0">Program Code</option>
+        <option value="1">Program Name</option>
+        <option value="2">College Code</option>
+      </select>
+    </div>
+    <div class="col-md-9">
+      <input
+        type="text"
+        id="customSearchProgram"
+        class="form-control"
+        placeholder="Type to search..."
+        data-table-search="input"
+      />
+    </div>
+  </div>
+
   <!-- programs datatable -->
   <table id="data-table" class="table table-striped table-bordered">
     <thead>
@@ -226,7 +247,11 @@
   >
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
-        <form method="post" action="{{ url_for('program.delete_program') }}">
+        <form
+          id="deleteProgramForm"
+          method="post"
+          action="{{ url_for('program.delete_program') }}"
+        >
           <div class="modal-header bg-danger text-white">
             <h5 class="modal-title">
               <i class="bi bi-exclamation-triangle-fill me-2"></i> Delete
