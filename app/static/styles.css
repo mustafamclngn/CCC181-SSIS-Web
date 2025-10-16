@@ -232,9 +232,29 @@ body.login-page {
   min-width: 300px;
 }
 
-/* ========== DASHBOARD UX IMPROVEMENTS ========== */
+/* toast notifications */
+.toast-notification.error,
+.toast-notification.danger {
+  background-color: #dc3545;
+}
 
-/* Table improvements */
+.toast-notification.warning {
+  background-color: #ffc107;
+}
+
+.toast-notification.success {
+  background-color: #28a745;
+}
+
+.toast-notification.info {
+  background-color: #17a2b8;
+}
+
+.toast-notification.hiding {
+  animation: slideOut 0.3s ease-out;
+}
+
+/* table */
 .table {
   margin-bottom: 0;
 }
@@ -248,13 +268,11 @@ body.login-page {
   border-bottom: 2px solid #dee2e6;
 }
 
-/* Better empty state */
 .text-muted.py-3 {
   font-style: italic;
   color: #adb5bd !important;
 }
 
-/* Spacing improvements */
 .mb-4 {
   margin-bottom: 1.5rem !important;
 }
