@@ -38,11 +38,18 @@ $(document).ready(function () {
     lengthChange: false,
     searching: true,
     dom: '<"row"<"col-sm-12"tr>><"row mt-3"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7 d-flex justify-content-end"p>>',
+    columnDefs: [
+      {
+        targets: -1,
+        orderable: false,
+      },
+    ],
   });
 
   const dashboardTable = $("#dashboard-table").DataTable({
     pageLength: 5,
     lengthChange: false,
+    searching: false,
   });
 
   // college search
