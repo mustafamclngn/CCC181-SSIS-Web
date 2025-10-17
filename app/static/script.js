@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 $(document).ready(function () {
   const dataTable = $("#data-table").DataTable({
-    pageLength: 15,
+    pageLength: 10,
     lengthChange: false,
     searching: true,
     dom: '<"row"<"col-sm-12"tr>><"row mt-3"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7 d-flex justify-content-end"p>>',
@@ -197,7 +197,7 @@ $(document).ready(function () {
       data: JSON.stringify({ code: code, name: name }),
       success: function (response) {
         if (response.exists) {
-          showToast("College code or name already exists!", "error");
+          showToast("College already exists!", "error");
         } else {
           e.target.submit();
         }
@@ -260,7 +260,7 @@ $(document).ready(function () {
       }),
       success: function (response) {
         if (response.exists) {
-          showToast("College code or name already exists!", "error");
+          showToast("College already exists!", "error");
         } else {
           e.target.submit();
         }
@@ -338,7 +338,7 @@ $(document).ready(function () {
       }),
       success: function (response) {
         if (response.exists) {
-          showToast("Program code or name already exists!", "error");
+          showToast("Program already exists!", "error");
         } else {
           e.target.submit();
         }
@@ -405,7 +405,7 @@ $(document).ready(function () {
       }),
       success: function (response) {
         if (response.exists) {
-          showToast("Program code or name already exists!", "error");
+          showToast("Program already exists!", "error");
         } else {
           e.target.submit();
         }
