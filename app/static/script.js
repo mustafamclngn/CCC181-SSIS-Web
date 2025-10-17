@@ -37,7 +37,7 @@ $(document).ready(function () {
     pageLength: 15,
     lengthChange: false,
     searching: true,
-    dom: '<"row"<"col-sm-12"tr>><"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7 d-flex justify-content-end"p>>',
+    dom: '<"row"<"col-sm-12"tr>><"row mt-3"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7 d-flex justify-content-end"p>>',
   });
 
   const dashboardTable = $("#dashboard-table").DataTable({
