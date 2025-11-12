@@ -1,5 +1,6 @@
 from flask import Flask, render_template, Blueprint, request, flash, redirect, url_for, jsonify
 from app.models.programs import ProgramModel
+from app.auth_decorators import login_required
 
 program_bp = Blueprint("program", __name__, template_folder="templates")
 
@@ -7,6 +8,7 @@ program_bp = Blueprint("program", __name__, template_folder="templates")
 # PROGRAMS PAGE
 # ==============================
 @program_bp.route("/programs")
+@login_required
 def programs():
     colleges_list = ProgramModel.get_all_colleges()
     programs_list = ProgramModel.get_all_programs()
@@ -20,6 +22,7 @@ def programs():
 
 # ========= CHECK IF PROGRAM EXISTS (AJAX) =========
 @program_bp.route("/programs/check", methods=["POST"])
+@login_required
 def check_program():
     data = request.get_json()
     code = data.get("code", "").strip().upper()
@@ -37,6 +40,7 @@ def check_program():
 # REGISTER PROGRAM
 # ==============================
 @program_bp.route("/programs/register", methods=["POST"])
+@login_required
 def register_program():
     program_code = request.form.get("code", "").strip().upper()
     program_name = request.form.get("name", "").strip().title()
@@ -63,6 +67,7 @@ def register_program():
 # EDIT PROGRAM
 # ==============================
 @program_bp.route("/programs/edit", methods=["POST"])
+@login_required
 def edit_program():
     original_code = request.form.get("original_code", "").strip().upper()
     new_code = request.form.get("code", "").strip().upper()
@@ -90,6 +95,7 @@ def edit_program():
 # DELETE PROGRAM
 # ==============================
 @program_bp.route("/programs/delete", methods=["POST"])
+@login_required
 def delete_program():
     code = request.form.get("code", "").strip().upper()
 

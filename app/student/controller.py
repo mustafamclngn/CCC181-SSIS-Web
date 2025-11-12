@@ -1,5 +1,6 @@
 from flask import Flask, render_template, Blueprint, request, flash, redirect, url_for, jsonify
 from app.models.students import StudentModel
+from app.auth_decorators import login_required
 
 student_bp = Blueprint("student", __name__, template_folder="templates")
 
@@ -7,6 +8,7 @@ student_bp = Blueprint("student", __name__, template_folder="templates")
 # STUDENTS PAGE
 # ==============================
 @student_bp.route("/students")
+@login_required
 def students():
     programs_list = StudentModel.get_all_programs()
     students_list = StudentModel.get_all_students()
@@ -22,6 +24,7 @@ def students():
 # CHECK IF STUDENT EXISTS (AJAX)
 # ==============================
 @student_bp.route("/students/check", methods=["POST"])
+@login_required
 def check_student():
     data = request.get_json()
     id_number = data.get("id_number", "").strip()
@@ -37,6 +40,7 @@ def check_student():
 # REGISTER STUDENT
 # ==============================
 @student_bp.route("/students/register", methods=["POST"])
+@login_required
 def register_student():
     id_number = request.form.get("id_number", "").strip()
     first_name = request.form.get("first_name", "").strip().title()
@@ -65,6 +69,7 @@ def register_student():
 # EDIT STUDENT
 # ==============================
 @student_bp.route("/students/edit", methods=["POST"])
+@login_required
 def edit_student():
     original_id = request.form.get("original_id", "").strip()
     id_number = request.form.get("id_number", "").strip()
@@ -94,6 +99,7 @@ def edit_student():
 # DELETE STUDENT
 # ==============================
 @student_bp.route("/students/delete", methods=["POST"])
+@login_required
 def delete_student():
     id_number = request.form.get("id_number", "").strip()
 

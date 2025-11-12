@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, session
 from werkzeug.security import check_password_hash
 from app.models.users import UserModel
 from app.user.forms import RegisterForm, LoginForm
+from app.auth_decorators import login_required, logout_required
 
 user_bp = Blueprint("user", __name__, template_folder="templates")
 
@@ -9,6 +10,7 @@ user_bp = Blueprint("user", __name__, template_folder="templates")
 # LOGIN
 # ==============================
 @user_bp.route("/login", methods=["GET", "POST"])
+@logout_required
 def login():
     form = LoginForm()
     if form.validate_on_submit():
@@ -19,6 +21,7 @@ def login():
 
         if user and check_password_hash(user["password"], password):
             session["user_id"] = user["id"]
+            session.permanent = form.remember_me.data
             flash("Welcome back!", "success")
             return redirect(url_for("dashboard.dashboard"))
         else:
@@ -30,6 +33,7 @@ def login():
 # REGISTER
 # ==============================
 @user_bp.route("/register", methods=["GET", "POST"])
+@logout_required
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
@@ -50,6 +54,7 @@ def register():
 # LOGOUT
 # ==============================
 @user_bp.route("/logout")
+@login_required
 def logout():
     session.clear()
     flash("You have been logged out.", "info")

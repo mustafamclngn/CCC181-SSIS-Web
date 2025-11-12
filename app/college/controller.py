@@ -1,9 +1,11 @@
 from flask import Flask, render_template, Blueprint, request, redirect, url_for, flash, jsonify
 from app.models.colleges import CollegeModel
+from app.auth_decorators import login_required
 
 college_bp = Blueprint("college", __name__, template_folder="templates")
 
 @college_bp.route("/colleges")
+@login_required
 def colleges():
     colleges_list = CollegeModel.get_all_colleges()
     return render_template("colleges.html", colleges=colleges_list)
@@ -11,6 +13,7 @@ def colleges():
 
 # ========= CHECK IF COLLEGE EXISTS (AJAX) =========
 @college_bp.route("/colleges/check", methods=["POST"])
+@login_required
 def check_college():
     data = request.get_json()
     code = data.get("code", "").strip().upper()
@@ -26,6 +29,7 @@ def check_college():
 
 # ========= REGISTER COLLEGE =========
 @college_bp.route("/colleges/register", methods=["POST"])
+@login_required
 def register_college():
     code = request.form.get("code", "").strip().upper()
     name = request.form.get("name", "").strip().title()
@@ -49,6 +53,7 @@ def register_college():
 
 # ========= EDIT COLLEGE =========
 @college_bp.route("/colleges/edit", methods=["POST"])
+@login_required
 def edit_college():
     original_code = request.form.get("original_code", "").strip().upper()
     new_code = request.form.get("code", "").strip().upper()
@@ -73,6 +78,7 @@ def edit_college():
 
 # ========= DELETE COLLEGE =========
 @college_bp.route("/colleges/delete", methods=["POST"])
+@login_required
 def delete_college():
     code = request.form.get("code", "").strip().upper()
 
