@@ -1,3 +1,15 @@
+function getCSRFToken() {
+  return $('meta[name=csrf-token]').attr('content');
+}
+
+$.ajaxSetup({
+  beforeSend: function(xhr, settings) {
+    if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+      xhr.setRequestHeader("X-CSRFToken", getCSRFToken());
+    }
+  }
+});
+
 // toast notification
 function showToast(message, type = "error") {
   const toast = document.createElement("div");
@@ -292,7 +304,7 @@ $(document).ready(function () {
       return;
     }
 
-    $("#deleteCollegeForm").submit();
+    $("#deleteForm").submit();
   });
 
   // ================================
@@ -433,7 +445,7 @@ $(document).ready(function () {
     const programCode = $("#deleteProgramCode").val();
 
     if (!programCode) {
-      alert("No program selected for deletion.");
+      showToast("No program selected for deletion.", "warning");
       return;
     }
 
@@ -637,7 +649,7 @@ $(document).ready(function () {
   $("#confirmDeleteStudentBtn").click(function () {
     const studentId = $("#deleteStudentId").val();
     if (!studentId) {
-      alert("No student selected for deletion.");
+      showToast("No student selected for deletion.", "warning");
       return;
     }
     $("#deleteStudentForm").submit();
