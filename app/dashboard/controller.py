@@ -1,5 +1,6 @@
 from flask import Flask, render_template, Blueprint, request, flash, redirect, url_for
 from app.models.dashboard import DashboardModel
+from app.auth_decorators import login_required
 
 dashboard_bp = Blueprint("dashboard", __name__, template_folder="templates")
 
@@ -7,6 +8,7 @@ dashboard_bp = Blueprint("dashboard", __name__, template_folder="templates")
 # DASHBOARD
 # ==============================
 @dashboard_bp.route("/dashboard")
+@login_required
 def dashboard():
     total_colleges = DashboardModel.get_total_colleges()
     total_programs = DashboardModel.get_total_programs()
