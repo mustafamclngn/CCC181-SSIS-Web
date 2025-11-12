@@ -86,6 +86,7 @@
           method="post"
           action="{{ url_for('college.register_college') }}"
         >
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
           <div class="modal-header">
             <h5 class="modal-title" id="registerModalLabel">
               Register College
@@ -152,6 +153,7 @@
           method="post"
           action="{{ url_for('college.edit_college') }}"
         >
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
           <div class="modal-header">
             <h5 class="modal-title" id="editModalLabel">Edit College</h5>
             <button
@@ -223,6 +225,7 @@
           method="post"
           action="{{ url_for('college.delete_college') }}"
         >
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
           <div class="modal-header bg-danger text-white">
             <h5 class="modal-title" id="deleteCollegeModal">
               <i class="bi bi-exclamation-triangle-fill me-2"></i> Delete

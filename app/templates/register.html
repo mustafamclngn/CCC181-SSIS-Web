@@ -68,16 +68,25 @@
           </div>
 
           <div class="mb-3">
-            {{ form.password.label(class="form-label") }} {{
-            form.password(class="form-control", placeholder="Enter password") }}
+            {{ form.password.label(class="form-label") }}
+            <div class="position-relative">
+              {{ form.password(class="form-control", placeholder="Enter password", id="password") }}
+              <i class="bi bi-eye-slash position-absolute top-50 end-0 translate-middle-y me-3 password-toggle" 
+                 id="togglePassword"></i>
+            </div>
             {% for error in form.password.errors %}
             <div class="text-danger small">{{ error }}</div>
             {% endfor %}
           </div>
 
           <div class="mb-3">
-            {{ form.confirm_password.label(class="form-label") }} {{
-            form.confirm_password(class="form-control", placeholder="Confirm password") }} {% for error in form.confirm_password.errors %}
+            {{ form.confirm_password.label(class="form-label") }}
+            <div class="position-relative">
+              {{ form.confirm_password(class="form-control", placeholder="Confirm password", id="confirmPassword") }}
+              <i class="bi bi-eye-slash position-absolute top-50 end-0 translate-middle-y me-3 password-toggle" 
+                 id="toggleConfirmPassword"></i>
+            </div>
+            {% for error in form.confirm_password.errors %}
             <div class="text-danger small">{{ error }}</div>
             {% endfor %}
           </div>
@@ -95,5 +104,29 @@
         </p>
       </div>
     </div>
+
+    <script>
+      // Toggle password
+      const togglePassword = document.getElementById('togglePassword');
+      const password = document.getElementById('password');
+
+      togglePassword.addEventListener('click', function () {
+        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+        password.setAttribute('type', type);
+        this.classList.toggle('bi-eye');
+        this.classList.toggle('bi-eye-slash');
+      });
+
+      // Toggle confirm password
+      const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+      const confirmPassword = document.getElementById('confirmPassword');
+
+      toggleConfirmPassword.addEventListener('click', function () {
+        const type = confirmPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+        confirmPassword.setAttribute('type', type);
+        this.classList.toggle('bi-eye');
+        this.classList.toggle('bi-eye-slash');
+      });
+    </script>
   </body>
 </html>

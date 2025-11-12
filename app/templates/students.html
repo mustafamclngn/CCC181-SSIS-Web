@@ -97,6 +97,7 @@
           method="post"
           action="{{ url_for('student.register_student') }}"
         >
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
           <div class="modal-header">
             <h5 class="modal-title">Register Student</h5>
             <button
@@ -208,6 +209,7 @@
           method="post"
           action="{{ url_for('student.edit_student') }}"
         >
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
           <div class="modal-header">
             <h5 class="modal-title">Edit Student</h5>
             <button
@@ -332,7 +334,12 @@
   >
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
-        <form method="post" action="{{ url_for('student.delete_student') }}">
+        <form
+          id="deleteStudentForm"
+          method="post"
+          action="{{ url_for('student.delete_student') }}"
+        >
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
           <div class="modal-header bg-danger text-white">
             <h5 class="modal-title">
               <i class="bi bi-exclamation-triangle-fill me-2"></i> Delete
