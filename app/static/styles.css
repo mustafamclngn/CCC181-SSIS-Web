@@ -3,6 +3,10 @@
   --sidebar-collapsed-width: 120px;
 }
 
+html {
+  font-size: 125%;
+}
+
 /* base */
 body {
   background-color: #ffffff;
@@ -180,6 +184,17 @@ body.login-page {
 
 .login-container .btn-primary:hover {
   background-color: #0b5ed7;
+}
+
+.form-check-label {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.password-toggle {
+  cursor: pointer;
+  color: #6c757d;
+  transition: color 0.2s;
 }
 
 .create-account-link {
