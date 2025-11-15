@@ -1,8 +1,22 @@
 from flask import Flask, render_template, Blueprint, request, flash, redirect, url_for, jsonify
 from app.models.students import StudentModel
 from app.auth_decorators import login_required
+from werkzeug.utils import secure_filename
+import os
+import uuid
 
 student_bp = Blueprint("student", __name__, template_folder="templates")
+
+from supabase import create_client
+SUPABASE_URL = os.environ.get("SUPABASE_URL")
+SUPABASE_KEY = os.environ.get("SUPABASE_ANON_KEY")
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+MAX_FILE_SIZE = 5 * 1024 * 1024
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # ==============================
 # STUDENTS PAGE
@@ -53,12 +67,44 @@ def register_student():
         flash("All fields are required.", "danger")
         return redirect(url_for("student.students"))
 
+    image_url = None
+
+    if 'student_image' in request.files:
+        file = request.files['student_image']
+        
+        if file and file.filename != '' and allowed_file(file.filename):
+            file.seek(0, os.SEEK_END)
+            file_size = file.tell()
+            file.seek(0)
+            
+            if file_size > MAX_FILE_SIZE:
+                flash('Image file size must be less than 5MB', 'danger')
+                return redirect(url_for('student.students'))
+            
+            file_ext = os.path.splitext(secure_filename(file.filename))[1]
+            unique_filename = f"{id_number}_{uuid.uuid4().hex}{file_ext}"
+            
+            file_bytes = file.read()
+            
+            try:
+                storage_response = supabase.storage.from_('students-images').upload(
+                    path=unique_filename,
+                    file=file_bytes,
+                    file_options={"content-type": file.content_type}
+                )
+                
+                image_url = supabase.storage.from_('students-images').get_public_url(unique_filename)
+                
+            except Exception as storage_error:
+                print(f"Storage error: {storage_error}")
+                flash('Error uploading image', 'warning')
+
     try:
         if StudentModel.check_student_exists(id_number):
             flash("Student ID already exists.", "warning")
             return redirect(url_for("student.students"))
 
-        StudentModel.create_student(id_number, first_name, last_name, gender, year_level, program_code)
+        StudentModel.create_student(id_number, first_name, last_name, gender, year_level, program_code, image_url)
         flash("Student registered successfully!", "success")
     except Exception as e:
         flash(f"Error: {str(e)}", "danger")
@@ -83,12 +129,44 @@ def edit_student():
         flash("All fields are required.", "danger")
         return redirect(url_for("student.students"))
 
+    image_url = None
+
+    if 'student_image' in request.files:
+        file = request.files['student_image']
+        
+        if file and file.filename != '' and allowed_file(file.filename):
+            file.seek(0, os.SEEK_END)
+            file_size = file.tell()
+            file.seek(0)
+            
+            if file_size > MAX_FILE_SIZE:
+                flash('Image file size must be less than 5MB', 'danger')
+                return redirect(url_for('student.students'))
+            
+            file_ext = os.path.splitext(secure_filename(file.filename))[1]
+            unique_filename = f"{id_number}_{uuid.uuid4().hex}{file_ext}"
+        
+            file_bytes = file.read()
+            
+            try:
+                storage_response = supabase.storage.from_('students-images').upload(
+                    path=unique_filename,
+                    file=file_bytes,
+                    file_options={"content-type": file.content_type}
+                )
+                
+                image_url = supabase.storage.from_('students-images').get_public_url(unique_filename)
+                
+            except Exception as storage_error:
+                print(f"Storage error: {storage_error}")
+                flash('Error uploading image', 'warning')
+
     try:
         if StudentModel.check_student_exists(id_number, original_id):
             flash("A student with this ID already exists.", "warning")
             return redirect(url_for("student.students"))
 
-        StudentModel.update_student(original_id, id_number, first_name, last_name, gender, year_level, program_code)
+        StudentModel.update_student(original_id, id_number, first_name, last_name, gender, year_level, program_code, image_url)
         flash("Student updated successfully!", "success")
     except Exception as e:
         flash(f"Error: {str(e)}", "danger")
