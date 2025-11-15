@@ -1,14 +1,19 @@
 from app.database import get_db
+from psycopg2.extras import RealDictCursor
 
 class CollegeModel:
     @staticmethod
     def get_all_colleges():
         db = get_db()
-        cursor = db.cursor()
+        cursor = db.cursor(cursor_factory=RealDictCursor)
         try:
-            cursor.execute("SELECT * FROM colleges ORDER BY collegecode ASC")
-            colleges_data = cursor.fetchall()
-            return [{"collegecode": c[0], "collegename": c[1]} for c in colleges_data]
+            cursor.execute("""
+                SELECT collegecode, collegename 
+                FROM colleges 
+                ORDER BY collegecode ASC
+            """)
+            colleges = cursor.fetchall()
+            return [dict(row) for row in colleges]
         finally:
             cursor.close()
     
@@ -18,16 +23,21 @@ class CollegeModel:
         cursor = db.cursor()
         try:
             if original_code:
-                cursor.execute(
-                    "SELECT COUNT(*) FROM colleges WHERE (collegecode = %s OR collegename = %s) AND collegecode != %s",
-                    (code, name, original_code)
-                )
+                cursor.execute("""
+                    SELECT EXISTS(
+                        SELECT 1 FROM colleges 
+                        WHERE (collegecode = %s OR collegename = %s) 
+                        AND collegecode != %s
+                    )
+                """, (code, name, original_code))
             else:
-                cursor.execute(
-                    "SELECT COUNT(*) FROM colleges WHERE collegecode = %s OR collegename = %s",
-                    (code, name)
-                )
-            return cursor.fetchone()[0] > 0
+                cursor.execute("""
+                    SELECT EXISTS(
+                        SELECT 1 FROM colleges 
+                        WHERE collegecode = %s OR collegename = %s
+                    )
+                """, (code, name))
+            return cursor.fetchone()[0]
         finally:
             cursor.close()
     

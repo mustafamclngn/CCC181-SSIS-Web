@@ -1,25 +1,37 @@
 from app.database import get_db
+from psycopg2.extras import RealDictCursor
 
 class ProgramModel:
     @staticmethod
     def get_all_colleges():
         db = get_db()
-        cursor = db.cursor()
+        cursor = db.cursor(cursor_factory=RealDictCursor)
         try:
-            cursor.execute("SELECT collegecode, collegename FROM colleges ORDER BY collegecode ASC")
-            colleges_data = cursor.fetchall()
-            return [{"code": c[0], "name": c[1]} for c in colleges_data]
+            cursor.execute("""
+                SELECT collegecode AS code, collegename AS name 
+                FROM colleges 
+                ORDER BY collegecode ASC
+            """)
+            colleges = cursor.fetchall()
+            return [dict(row) for row in colleges]
         finally:
             cursor.close()
     
     @staticmethod
     def get_all_programs():
         db = get_db()
-        cursor = db.cursor()
+        cursor = db.cursor(cursor_factory=RealDictCursor)
         try:
-            cursor.execute("SELECT programcode, programname, collegecode FROM programs ORDER BY programcode ASC")
-            programs_data = cursor.fetchall()
-            return [{"code": p[0], "name": p[1], "college_code": p[2]} for p in programs_data]
+            cursor.execute("""
+                SELECT 
+                    programcode AS code, 
+                    programname AS name, 
+                    collegecode AS college_code 
+                FROM programs 
+                ORDER BY programcode ASC
+            """)
+            programs = cursor.fetchall()
+            return [dict(row) for row in programs]
         finally:
             cursor.close()
     
@@ -29,16 +41,21 @@ class ProgramModel:
         cursor = db.cursor()
         try:
             if original_code:
-                cursor.execute(
-                    "SELECT COUNT(*) FROM programs WHERE (programcode = %s OR programname = %s) AND programcode != %s",
-                    (code, name, original_code)
-                )
+                cursor.execute("""
+                    SELECT EXISTS(
+                        SELECT 1 FROM programs 
+                        WHERE (programcode = %s OR programname = %s) 
+                        AND programcode != %s
+                    )
+                """, (code, name, original_code))
             else:
-                cursor.execute(
-                    "SELECT COUNT(*) FROM programs WHERE programcode = %s OR programname = %s",
-                    (code, name)
-                )
-            return cursor.fetchone()[0] > 0
+                cursor.execute("""
+                    SELECT EXISTS(
+                        SELECT 1 FROM programs 
+                        WHERE programcode = %s OR programname = %s
+                    )
+                """, (code, name))
+            return cursor.fetchone()[0]
         finally:
             cursor.close()
     
