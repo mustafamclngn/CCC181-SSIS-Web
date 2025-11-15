@@ -52,6 +52,7 @@
   <table id="data-table" class="table table-striped table-bordered">
     <thead>
       <tr>
+        <th scope="col">Photo</th>
         <th scope="col">ID-number</th>
         <th scope="col">First Name</th>
         <th scope="col">Last Name</th>
@@ -64,6 +65,28 @@
     <tbody>
       {% for student in students %}
       <tr>
+        <td class="text-center">
+          {% if student.image_url %}
+          <img
+            src="{{ student.image_url }}"
+            alt="{{ student.first_name }}"
+            class="rounded-circle"
+            style="
+              width: 45px;
+              height: 45px;
+              object-fit: cover;
+              border: 2px solid #dee2e6;
+            "
+          />
+          {% else %}
+          <div
+            class="rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white mx-auto"
+            style="width: 45px; height: 45px; font-size: 16px; font-weight: 600"
+          >
+            {{ student.first_name[0] }}{{ student.last_name[0] }}
+          </div>
+          {% endif %}
+        </td>
         <td>{{ student.id_number }}</td>
         <td>{{ student.first_name }}</td>
         <td>{{ student.last_name }}</td>
@@ -96,8 +119,9 @@
           id="registerStudentForm"
           method="post"
           action="{{ url_for('student.register_student') }}"
+          enctype="multipart/form-data"
         >
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
           <div class="modal-header">
             <h5 class="modal-title">Register Student</h5>
             <button
@@ -106,42 +130,93 @@
               data-bs-dismiss="modal"
             ></button>
           </div>
-          <div class="modal-body">
+          <div class="modal-body" style="max-height: 70vh; overflow-y: auto">
             <div class="mb-3">
-              <label for="idNumber" class="form-label">ID Number:</label>
+              <label for="idNumber" class="form-label">ID Number</label>
               <input
                 type="text"
                 class="form-control"
                 id="idNumber"
                 name="id_number"
-                placeholder="e.g. 2024-0001"
+                placeholder="Enter ID number"
                 required
               />
             </div>
             <div class="mb-3">
-              <label for="firstName" class="form-label">First Name:</label>
-              <input
-                type="text"
-                class="form-control"
-                id="firstName"
-                name="first_name"
-                placeholder="Enter first name"
-                required
-              />
+              <label for="studentImage" class="form-label"
+                >Student Picture</label
+              >
+              <div
+                class="border rounded p-3 text-center"
+                id="dropZone"
+                style="border-style: dashed !important; cursor: pointer"
+              >
+                <input
+                  type="file"
+                  class="form-control d-none"
+                  id="studentImage"
+                  name="student_image"
+                  accept="image/*"
+                />
+                <div id="dropZoneContent">
+                  <button type="button" class="btn btn-success">
+                    Choose Image
+                  </button>
+                  <p class="mb-0 mt-2">
+                    <small class="text-muted"
+                      >PNG, JPG or JPEG (MAX. 5MB)</small
+                    >
+                  </p>
+                </div>
+                <div id="imagePreview" class="d-none">
+                  <img
+                    id="previewImg"
+                    src=""
+                    alt="Preview"
+                    class="img-thumbnail"
+                    style="max-height: 120px"
+                  />
+                  <p class="mt-2 mb-0">
+                    <small id="fileName" class="text-muted"></small>
+                  </p>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-danger mt-2"
+                    id="removeImage"
+                  >
+                    <i class="bi bi-x-circle"></i> Remove
+                  </button>
+                </div>
+              </div>
             </div>
-            <div class="mb-3">
-              <label for="lastName" class="form-label">Last Name:</label>
-              <input
-                type="text"
-                class="form-control"
-                id="lastName"
-                name="last_name"
-                placeholder="Enter last name"
-                required
-              />
+
+            <div class="row mb-3">
+              <div class="col-6">
+                <label for="firstName" class="form-label">First Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="firstName"
+                  name="first_name"
+                  placeholder="Enter first name"
+                  required
+                />
+              </div>
+              <div class="col-6">
+                <label for="lastName" class="form-label">Last Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="lastName"
+                  name="last_name"
+                  placeholder="Enter last name"
+                  required
+                />
+              </div>
             </div>
+
             <div class="mb-3">
-              <label for="programCode" class="form-label">Program Code:</label>
+              <label for="programCode" class="form-label">Program</label>
               <select
                 class="form-select"
                 id="programCode"
@@ -154,28 +229,31 @@
                 {% endfor %}
               </select>
             </div>
-            <div class="mb-3">
-              <label for="yearLevel" class="form-label">Year Level:</label>
-              <select
-                class="form-select"
-                id="yearLevel"
-                name="year_level"
-                required
-              >
-                <option value="" disabled selected>Select year level</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label for="gender" class="form-label">Gender:</label>
-              <select class="form-select" id="gender" name="gender" required>
-                <option value="" disabled selected>Select gender</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-              </select>
+
+            <div class="row mb-3">
+              <div class="col-6">
+                <label for="yearLevel" class="form-label">Year Level</label>
+                <select
+                  class="form-select"
+                  id="yearLevel"
+                  name="year_level"
+                  required
+                >
+                  <option value="" disabled selected>Select year level</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                </select>
+              </div>
+              <div class="col-6">
+                <label for="gender" class="form-label">Gender</label>
+                <select class="form-select" id="gender" name="gender" required>
+                  <option value="" disabled selected>Select gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                </select>
+              </div>
             </div>
           </div>
           <div class="modal-footer">
@@ -184,16 +262,79 @@
               class="btn btn-secondary"
               data-bs-dismiss="modal"
             >
-              Close
+              Cancel
             </button>
             <button type="submit" class="btn btn-success">
-              <i class="bi bi-plus-lg"></i> Register
+              <i class="bi bi-plus-lg"></i> Register Student
             </button>
           </div>
         </form>
       </div>
     </div>
   </div>
+
+  <script>
+    const dropZone = document.getElementById("dropZone");
+    const fileInput = document.getElementById("studentImage");
+    const dropZoneContent = document.getElementById("dropZoneContent");
+    const imagePreview = document.getElementById("imagePreview");
+    const previewImg = document.getElementById("previewImg");
+    const fileName = document.getElementById("fileName");
+    const removeImageBtn = document.getElementById("removeImage");
+
+    dropZone.addEventListener("click", (e) => {
+      if (e.target.id !== "removeImage" && !e.target.closest("#removeImage")) {
+        fileInput.click();
+      }
+    });
+
+    dropZone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      dropZone.classList.add("border-primary", "bg-light");
+    });
+
+    dropZone.addEventListener("dragleave", () => {
+      dropZone.classList.remove("border-primary", "bg-light");
+    });
+
+    dropZone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dropZone.classList.remove("border-primary", "bg-light");
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        fileInput.files = files;
+        handleFileSelect(files[0]);
+      }
+    });
+
+    fileInput.addEventListener("change", (e) => {
+      if (e.target.files.length > 0) {
+        handleFileSelect(e.target.files[0]);
+      }
+    });
+
+    function handleFileSelect(file) {
+      if (file && file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          previewImg.src = e.target.result;
+          fileName.textContent = file.name;
+          dropZoneContent.classList.add("d-none");
+          imagePreview.classList.remove("d-none");
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    removeImageBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      fileInput.value = "";
+      previewImg.src = "";
+      fileName.textContent = "";
+      imagePreview.classList.add("d-none");
+      dropZoneContent.classList.remove("d-none");
+    });
+  </script>
 
   <!-- ================== EDIT STUDENT MODAL ================== -->
   <div
@@ -208,8 +349,9 @@
           id="editStudentForm"
           method="post"
           action="{{ url_for('student.edit_student') }}"
+          enctype="multipart/form-data"
         >
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
           <div class="modal-header">
             <h5 class="modal-title">Edit Student</h5>
             <button
@@ -218,7 +360,7 @@
               data-bs-dismiss="modal"
             ></button>
           </div>
-          <div class="modal-body">
+          <div class="modal-body" style="max-height: 70vh; overflow-y: auto">
             <input
               type="hidden"
               name="original_id"
@@ -231,81 +373,139 @@
             />
 
             <div class="mb-3">
-              <label for="editStudentId" class="form-label">ID Number:</label>
+              <label for="editStudentId" class="form-label">ID Number</label>
               <input
                 type="text"
                 class="form-control"
                 id="editStudentId"
                 name="id_number"
+                placeholder="Enter ID number"
                 required
               />
             </div>
             <div class="mb-3">
-              <label for="editStudentFirstName" class="form-label"
-                >First Name:</label
+              <label for="editStudentImage" class="form-label"
+                >Student Picture</label
               >
-              <input
-                type="text"
-                class="form-control"
-                id="editStudentFirstName"
-                name="first_name"
-                required
-              />
+              <div
+                class="border rounded p-3 text-center"
+                id="editDropZone"
+                style="border-style: dashed !important; cursor: pointer"
+              >
+                <input
+                  type="file"
+                  class="form-control d-none"
+                  id="editStudentImage"
+                  name="student_image"
+                  accept="image/*"
+                />
+                <div id="editDropZoneContent">
+                  <button type="button" class="btn btn-success">
+                    Choose Image
+                  </button>
+                  <p class="mb-0 mt-2">
+                    <small class="text-muted"
+                      >PNG, JPG or JPEG (MAX. 5MB)</small
+                    >
+                  </p>
+                </div>
+                <div id="editImagePreview" class="d-none">
+                  <img
+                    id="editPreviewImg"
+                    src=""
+                    alt="Preview"
+                    class="img-thumbnail"
+                    style="max-height: 120px"
+                  />
+                  <p class="mt-2 mb-0">
+                    <small id="editFileName" class="text-muted"></small>
+                  </p>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-danger mt-2"
+                    id="editRemoveImage"
+                  >
+                    <i class="bi bi-x-circle"></i> Remove
+                  </button>
+                </div>
+              </div>
             </div>
-            <div class="mb-3">
-              <label for="editStudentLastName" class="form-label"
-                >Last Name:</label
-              >
-              <input
-                type="text"
-                class="form-control"
-                id="editStudentLastName"
-                name="last_name"
-                required
-              />
+
+            <div class="row mb-3">
+              <div class="col-6">
+                <label for="editStudentFirstName" class="form-label"
+                  >First Name</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="editStudentFirstName"
+                  name="first_name"
+                  placeholder="Enter first name"
+                  required
+                />
+              </div>
+              <div class="col-6">
+                <label for="editStudentLastName" class="form-label"
+                  >Last Name</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="editStudentLastName"
+                  name="last_name"
+                  placeholder="Enter last name"
+                  required
+                />
+              </div>
             </div>
+
             <div class="mb-3">
-              <label for="editStudentProgram" class="form-label"
-                >Program Code:</label
-              >
+              <label for="editStudentProgram" class="form-label">Program</label>
               <select
                 class="form-select"
                 id="editStudentProgram"
                 name="program_code"
                 required
               >
+                <option value="" disabled>Select a program</option>
                 {% for program in programs %}
                 <option value="{{ program.code }}">{{ program.code }}</option>
                 {% endfor %}
               </select>
             </div>
-            <div class="mb-3">
-              <label for="editStudentYearLevel" class="form-label"
-                >Year Level:</label
-              >
-              <select
-                class="form-select"
-                id="editStudentYearLevel"
-                name="year_level"
-                required
-              >
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label for="editStudentGender" class="form-label">Gender:</label>
-              <select
-                class="form-select"
-                id="editStudentGender"
-                name="gender"
-                required
-              >
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-              </select>
+
+            <div class="row mb-3">
+              <div class="col-6">
+                <label for="editStudentYearLevel" class="form-label"
+                  >Year Level</label
+                >
+                <select
+                  class="form-select"
+                  id="editStudentYearLevel"
+                  name="year_level"
+                  required
+                >
+                  <option value="" disabled>Select year level</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                </select>
+              </div>
+              <div class="col-6">
+                <label for="editStudentGender" class="form-label">Gender</label>
+                <select
+                  class="form-select"
+                  id="editStudentGender"
+                  name="gender"
+                  required
+                >
+                  <option value="" disabled>Select gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                </select>
+              </div>
             </div>
           </div>
           <div class="modal-footer">
@@ -325,6 +525,80 @@
     </div>
   </div>
 
+  <script>
+    const editDropZone = document.getElementById("editDropZone");
+    const editFileInput = document.getElementById("editStudentImage");
+    const editDropZoneContent = document.getElementById("editDropZoneContent");
+    const editImagePreview = document.getElementById("editImagePreview");
+    const editPreviewImg = document.getElementById("editPreviewImg");
+    const editFileName = document.getElementById("editFileName");
+    const editRemoveImageBtn = document.getElementById("editRemoveImage");
+
+    editDropZone.addEventListener("click", (e) => {
+      if (
+        e.target.id !== "editRemoveImage" &&
+        !e.target.closest("#editRemoveImage")
+      ) {
+        editFileInput.click();
+      }
+    });
+
+    editDropZone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      editDropZone.classList.add("border-primary", "bg-light");
+    });
+
+    editDropZone.addEventListener("dragleave", () => {
+      editDropZone.classList.remove("border-primary", "bg-light");
+    });
+
+    editDropZone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      editDropZone.classList.remove("border-primary", "bg-light");
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        editFileInput.files = files;
+        handleEditFileSelect(files[0]);
+      }
+    });
+
+    editFileInput.addEventListener("change", (e) => {
+      if (e.target.files.length > 0) {
+        handleEditFileSelect(e.target.files[0]);
+      }
+    });
+
+    function handleEditFileSelect(file) {
+      if (file && file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          editPreviewImg.src = e.target.result;
+          editFileName.textContent = file.name;
+          editDropZoneContent.classList.add("d-none");
+          editImagePreview.classList.remove("d-none");
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    editRemoveImageBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      editFileInput.value = "";
+      editPreviewImg.src = "";
+      editFileName.textContent = "";
+      editImagePreview.classList.add("d-none");
+      editDropZoneContent.classList.remove("d-none");
+    });
+
+    $("#editStudentModal").on("hidden.bs.modal", function () {
+      editFileInput.value = "";
+      editPreviewImg.src = "";
+      editFileName.textContent = "";
+      editImagePreview.classList.add("d-none");
+      editDropZoneContent.classList.remove("d-none");
+    });
+  </script>
+
   <!-- ================== DELETE STUDENT MODAL ================== -->
   <div
     class="modal fade"
@@ -339,7 +613,7 @@
           method="post"
           action="{{ url_for('student.delete_student') }}"
         >
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
           <div class="modal-header bg-danger text-white">
             <h5 class="modal-title">
               <i class="bi bi-exclamation-triangle-fill me-2"></i> Delete
