@@ -1,13 +1,16 @@
 function getCSRFToken() {
-  return $('meta[name=csrf-token]').attr('content');
+  return $("meta[name=csrf-token]").attr("content");
 }
 
 $.ajaxSetup({
-  beforeSend: function(xhr, settings) {
-    if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+  beforeSend: function (xhr, settings) {
+    if (
+      !/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) &&
+      !this.crossDomain
+    ) {
       xhr.setRequestHeader("X-CSRFToken", getCSRFToken());
     }
-  }
+  },
 });
 
 // toast notification
@@ -63,6 +66,10 @@ $(document).ready(function () {
     lengthChange: false,
     searching: false,
   });
+
+  // ================================
+  // SEARCH FUNCTIONS
+  // ================================
 
   // college search
   const searchColumnCollege = $("#searchByColumnCollege");
@@ -538,13 +545,15 @@ $(document).ready(function () {
   $(document).on("click", ".btn-edit", function (e) {
     e.preventDefault();
     const row = $(this).closest("tr");
-
-    const idNumber = row.find("td:eq(0)").text().trim();
-    const firstName = row.find("td:eq(1)").text().trim();
-    const lastName = row.find("td:eq(2)").text().trim();
-    const programCode = row.find("td:eq(3)").text().trim();
-    const yearLevel = row.find("td:eq(4)").text().trim();
-    const gender = row.find("td:eq(5)").text().trim();
+    const imageCell = row.find("td:eq(0)");
+    const imageElement = imageCell.find("img");
+    const imageUrl = imageElement.length ? imageElement.attr("src") : null;
+    const idNumber = row.find("td:eq(1)").text().trim();
+    const firstName = row.find("td:eq(2)").text().trim();
+    const lastName = row.find("td:eq(3)").text().trim();
+    const programCode = row.find("td:eq(4)").text().trim();
+    const yearLevel = row.find("td:eq(5)").text().trim();
+    const gender = row.find("td:eq(6)").text().trim();
 
     $("#editOriginalStudentId").val(idNumber);
     $("#editStudentId").val(idNumber);
@@ -553,94 +562,27 @@ $(document).ready(function () {
     $("#editStudentProgram").val(programCode);
     $("#editStudentYearLevel").val(yearLevel);
     $("#editStudentGender").val(gender);
+    if (imageUrl) {
+      $("#editPreviewImg").attr("src", imageUrl);
+      $("#editFileName").text("Current image");
+      $("#editDropZoneContent").addClass("d-none");
+      $("#editImagePreview").removeClass("d-none");
+    } else {
+      $("#editPreviewImg").attr("src", "");
+      $("#editFileName").text("");
+      $("#editImagePreview").addClass("d-none");
+      $("#editDropZoneContent").removeClass("d-none");
+    }
+    $("#editStudentImage").val("");
 
     $("#editStudentModal").modal("show");
-  });
-
-  $("#editStudentId").on("input", function () {
-    let value = this.value.toUpperCase();
-    value = value.replace(/[^0-9-]/g, "");
-
-    if (value.length > 4 && value[4] !== "-") {
-      value = value.slice(0, 4) + "-" + value.slice(4);
-    }
-    if (value.length > 9) {
-      value = value.slice(0, 9);
-    }
-    this.value = value;
-  });
-
-  $("#editStudentFirstName").on("input", function () {
-    this.value = this.value.replace(/[^A-Za-z\s]/g, "");
-  });
-
-  $("#editStudentLastName").on("input", function () {
-    this.value = this.value.replace(/[^A-Za-z\s]/g, "");
-  });
-
-  $("#editStudentForm").submit(function (e) {
-    e.preventDefault();
-
-    const originalId = $("#editOriginalStudentId").val().trim();
-    const idNumber = $("#editStudentId").val().trim().toUpperCase();
-    const firstName = $("#editStudentFirstName").val().trim();
-    const lastName = $("#editStudentLastName").val().trim();
-    const programCode = $("#editStudentProgram").val().trim();
-    const yearLevel = $("#editStudentYearLevel").val().trim();
-    const gender = $("#editStudentGender").val().trim();
-
-    if (
-      !idNumber ||
-      !firstName ||
-      !lastName ||
-      !programCode ||
-      !yearLevel ||
-      !gender
-    ) {
-      showToast("Please fill in all fields.", "warning");
-      return;
-    }
-
-    const idPattern = /^20\d{2}-\d{4}$/;
-    if (!idPattern.test(idNumber)) {
-      showToast(
-        "ID Number must follow the format: 20xx-xxxx (e.g., 2023-0001).",
-        "error"
-      );
-      return;
-    }
-
-    $.ajax({
-      url: "/students/check",
-      method: "POST",
-      contentType: "application/json",
-      data: JSON.stringify({
-        id_number: idNumber,
-        first_name: firstName,
-        last_name: lastName,
-        original_id: originalId,
-      }),
-      success: function (response) {
-        if (response.exists) {
-          showToast("Student ID already exists!", "error");
-        } else {
-          e.target.submit();
-        }
-      },
-      error: function () {
-        showToast(
-          "Error checking student existence. Please try again.",
-          "error"
-        );
-      },
-    });
   });
 
   // DELETE
   $(document).on("click", ".btn-delete", function (e) {
     e.preventDefault();
     const row = $(this).closest("tr");
-    const studentId = row.find("td:eq(0)").text().trim();
+    const studentId = row.find("td:eq(1)").text().trim();
 
     $("#deleteStudentId").val(studentId);
     $("#deleteStudentModal").modal("show");
@@ -654,4 +596,47 @@ $(document).ready(function () {
     }
     $("#deleteStudentForm").submit();
   });
+});
+
+// ================================
+// RESET MODALS ON CLOSE
+// ================================
+
+// reset college modals
+$("#registerCollegeModal").on("hidden.bs.modal", function () {
+  $("#registerCollegeForm")[0].reset();
+});
+
+$("#editCollegeModal").on("hidden.bs.modal", function () {
+  $("#editForm")[0].reset();
+});
+
+$("#deleteCollegeModal").on("hidden.bs.modal", function () {
+  $("#deleteForm")[0].reset();
+});
+
+// reset program modals
+$("#registerProgramModal").on("hidden.bs.modal", function () {
+  $("#registerProgramForm")[0].reset();
+});
+
+$("#editProgramModal").on("hidden.bs.modal", function () {
+  $("#editProgramForm")[0].reset();
+});
+
+$("#deleteProgramModal").on("hidden.bs.modal", function () {
+  $("#deleteProgramForm")[0].reset();
+});
+
+// reset students modals
+$("#registerStudentModal").on("hidden.bs.modal", function () {
+  $("#registerStudentForm")[0].reset();
+});
+
+$("#editStudentModal").on("hidden.bs.modal", function () {
+  $("#editStudentForm")[0].reset();
+});
+
+$("#deleteStudentModal").on("hidden.bs.modal", function () {
+  $("#deleteStudentForm")[0].reset();
 });
