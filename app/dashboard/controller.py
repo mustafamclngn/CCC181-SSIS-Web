@@ -10,19 +10,14 @@ dashboard_bp = Blueprint("dashboard", __name__, template_folder="templates")
 @dashboard_bp.route("/dashboard")
 @login_required
 def dashboard():
-    total_colleges = DashboardModel.get_total_colleges()
-    total_programs = DashboardModel.get_total_programs()
-    total_students = DashboardModel.get_total_students()
-    top_colleges = DashboardModel.get_top_colleges(limit=5)
-    top_programs = DashboardModel.get_top_programs(limit=5)
-    college_statistics = DashboardModel.get_college_statistics()
-
+    data = DashboardModel.get_all_dashboard_data(top_limit=5)
+    
     return render_template(
         "dashboard.html",
-        total_colleges=total_colleges,
-        total_programs=total_programs,
-        total_students=total_students,
-        top_colleges=top_colleges,
-        top_programs=top_programs,
-        college_statistics=college_statistics,
+        total_colleges=data['total_colleges'],
+        total_programs=data['total_programs'],
+        total_students=data['total_students'],
+        top_colleges=data['top_colleges'],
+        top_programs=data['top_programs'],
+        college_statistics=data['college_statistics'],
     )
