@@ -299,3 +299,17 @@ body.login-page {
 * {
   font-family: "Poppins", sans-serif;
 }
+
+#data-table tbody tr {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+#data-table tbody tr:hover {
+  background-color: rgba(13, 110, 253, 0.1) !important;
+}
+
+#data-table tbody tr .btn {
+  position: relative;
+  z-index: 10;
+}
