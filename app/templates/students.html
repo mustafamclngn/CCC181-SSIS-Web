@@ -29,12 +29,12 @@
     <div class="col-md-3">
       <select id="searchByColumnStudent" class="form-select">
         <option value="-1">All Columns</option>
-        <option value="0">ID Number</option>
-        <option value="1">First Name</option>
-        <option value="2">Last Name</option>
-        <option value="3">Program Code</option>
-        <option value="4">Year Level</option>
-        <option value="5">Gender</option>
+        <option value="1">ID Number</option>
+        <option value="2">First Name</option>
+        <option value="3">Last Name</option>
+        <option value="4">Program Code</option>
+        <option value="5">Year Level</option>
+        <option value="6">Gender</option>
       </select>
     </div>
     <div class="col-md-9">
@@ -648,6 +648,113 @@
             </button>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================== VIEW STUDENT DETAILS MODAL ================== -->
+<div class="modal fade" id="viewStudentModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Student Details</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-4 text-center">
+            <img
+              id="viewStudentImage"
+              src=""
+              alt="Student Photo"
+              class="rounded-circle d-none mb-3"
+              style="width: 150px; height: 150px; object-fit: cover"
+            />
+            <div
+              id="viewStudentInitials"
+              class="rounded-circle bg-secondary d-none align-items-center justify-content-center text-white mx-auto mb-3"
+              style="
+                width: 150px;
+                height: 150px;
+                font-size: 48px;
+                font-weight: 600;
+              "
+            ></div>
+          </div>
+          <div class="col-md-8">
+            <div class="mb-3">
+              <label class="form-label">ID Number:</label>
+              <input
+                type="text"
+                class="form-control"
+                id="viewStudentId"
+                readonly
+              />
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-6">
+                <label class="form-label">First Name:</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="viewStudentFirstName"
+                  readonly
+                />
+              </div>
+              <div class="col-6">
+                <label class="form-label">Last Name:</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="viewStudentLastName"
+                  readonly
+                />
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Program Code:</label>
+              <input
+                type="text"
+                class="form-control"
+                id="viewStudentProgram"
+                readonly
+              />
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-6">
+                <label class="form-label">Year Level:</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="viewStudentYearLevel"
+                  readonly
+                />
+              </div>
+              <div class="col-6">
+                <label class="form-label">Gender:</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="viewStudentGender"
+                  readonly
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
       </div>
     </div>
   </div>
