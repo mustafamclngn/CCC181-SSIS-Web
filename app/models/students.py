@@ -44,23 +44,38 @@ class StudentModel:
     @staticmethod
     def get_all_students():
         db = get_db()
-        cursor = db.cursor()
+        cursor = db.cursor(cursor_factory=RealDictCursor)
         try:
             cursor.execute("""
-                SELECT idnumber, firstname, lastname, gender, yearlevel, programcode, imageurl
-                FROM students
-                ORDER BY lastname, firstname
+                SELECT 
+                    s.idnumber,
+                    s.firstname,
+                    s.lastname,
+                    s.gender,
+                    s.yearlevel,
+                    s.programcode,
+                    s.imageurl,
+                    p.programname,
+                    c.collegecode,
+                    c.collegename
+                FROM students s
+                LEFT JOIN programs p ON s.programcode = p.programcode
+                LEFT JOIN colleges c ON p.collegecode = c.collegecode
+                ORDER BY s.lastname, s.firstname
             """)
             students_data = cursor.fetchall()
             return [
                 {
-                    "id_number": s[0],
-                    "first_name": s[1],
-                    "last_name": s[2],
-                    "gender": s[3],
-                    "year_level": s[4],
-                    "program_code": s[5],
-                    "image_url": s[6],
+                    "id_number": s['idnumber'],
+                    "first_name": s['firstname'],
+                    "last_name": s['lastname'],
+                    "gender": s['gender'],
+                    "year_level": s['yearlevel'],
+                    "program_code": s['programcode'],
+                    "image_url": s['imageurl'],
+                    "programname": s['programname'],
+                    "collegecode": s['collegecode'],
+                    "collegename": s['collegename']
                 }
                 for s in students_data
             ]
