@@ -64,7 +64,11 @@
     </thead>
     <tbody>
       {% for student in students %}
-      <tr>
+      <tr
+        data-program-name="{{ student.programname or 'N/A' }}"
+        data-college-code="{{ student.collegecode or 'N/A' }}"
+        data-college-name="{{ student.collegename or 'N/A' }}"
+      >
         <td class="text-center">
           {% if student.image_url %}
           <img
@@ -273,69 +277,6 @@
     </div>
   </div>
 
-  <script>
-    const dropZone = document.getElementById("dropZone");
-    const fileInput = document.getElementById("studentImage");
-    const dropZoneContent = document.getElementById("dropZoneContent");
-    const imagePreview = document.getElementById("imagePreview");
-    const previewImg = document.getElementById("previewImg");
-    const fileName = document.getElementById("fileName");
-    const removeImageBtn = document.getElementById("removeImage");
-
-    dropZone.addEventListener("click", (e) => {
-      if (e.target.id !== "removeImage" && !e.target.closest("#removeImage")) {
-        fileInput.click();
-      }
-    });
-
-    dropZone.addEventListener("dragover", (e) => {
-      e.preventDefault();
-      dropZone.classList.add("border-primary", "bg-light");
-    });
-
-    dropZone.addEventListener("dragleave", () => {
-      dropZone.classList.remove("border-primary", "bg-light");
-    });
-
-    dropZone.addEventListener("drop", (e) => {
-      e.preventDefault();
-      dropZone.classList.remove("border-primary", "bg-light");
-      const files = e.dataTransfer.files;
-      if (files.length > 0) {
-        fileInput.files = files;
-        handleFileSelect(files[0]);
-      }
-    });
-
-    fileInput.addEventListener("change", (e) => {
-      if (e.target.files.length > 0) {
-        handleFileSelect(e.target.files[0]);
-      }
-    });
-
-    function handleFileSelect(file) {
-      if (file && file.type.startsWith("image/")) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          previewImg.src = e.target.result;
-          fileName.textContent = file.name;
-          dropZoneContent.classList.add("d-none");
-          imagePreview.classList.remove("d-none");
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-
-    removeImageBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      fileInput.value = "";
-      previewImg.src = "";
-      fileName.textContent = "";
-      imagePreview.classList.add("d-none");
-      dropZoneContent.classList.remove("d-none");
-    });
-  </script>
-
   <!-- ================== EDIT STUDENT MODAL ================== -->
   <div
     class="modal fade"
@@ -525,80 +466,6 @@
     </div>
   </div>
 
-  <script>
-    const editDropZone = document.getElementById("editDropZone");
-    const editFileInput = document.getElementById("editStudentImage");
-    const editDropZoneContent = document.getElementById("editDropZoneContent");
-    const editImagePreview = document.getElementById("editImagePreview");
-    const editPreviewImg = document.getElementById("editPreviewImg");
-    const editFileName = document.getElementById("editFileName");
-    const editRemoveImageBtn = document.getElementById("editRemoveImage");
-
-    editDropZone.addEventListener("click", (e) => {
-      if (
-        e.target.id !== "editRemoveImage" &&
-        !e.target.closest("#editRemoveImage")
-      ) {
-        editFileInput.click();
-      }
-    });
-
-    editDropZone.addEventListener("dragover", (e) => {
-      e.preventDefault();
-      editDropZone.classList.add("border-primary", "bg-light");
-    });
-
-    editDropZone.addEventListener("dragleave", () => {
-      editDropZone.classList.remove("border-primary", "bg-light");
-    });
-
-    editDropZone.addEventListener("drop", (e) => {
-      e.preventDefault();
-      editDropZone.classList.remove("border-primary", "bg-light");
-      const files = e.dataTransfer.files;
-      if (files.length > 0) {
-        editFileInput.files = files;
-        handleEditFileSelect(files[0]);
-      }
-    });
-
-    editFileInput.addEventListener("change", (e) => {
-      if (e.target.files.length > 0) {
-        handleEditFileSelect(e.target.files[0]);
-      }
-    });
-
-    function handleEditFileSelect(file) {
-      if (file && file.type.startsWith("image/")) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          editPreviewImg.src = e.target.result;
-          editFileName.textContent = file.name;
-          editDropZoneContent.classList.add("d-none");
-          editImagePreview.classList.remove("d-none");
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-
-    editRemoveImageBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      editFileInput.value = "";
-      editPreviewImg.src = "";
-      editFileName.textContent = "";
-      editImagePreview.classList.add("d-none");
-      editDropZoneContent.classList.remove("d-none");
-    });
-
-    $("#editStudentModal").on("hidden.bs.modal", function () {
-      editFileInput.value = "";
-      editPreviewImg.src = "";
-      editFileName.textContent = "";
-      editImagePreview.classList.add("d-none");
-      editDropZoneContent.classList.remove("d-none");
-    });
-  </script>
-
   <!-- ================== DELETE STUDENT MODAL ================== -->
   <div
     class="modal fade"
@@ -667,7 +534,7 @@
       </div>
       <div class="modal-body">
         <div class="row">
-          <div class="col-md-4 text-center">
+          <div class="col-md-4 text-center mb-4 mb-md-0">
             <img
               id="viewStudentImage"
               src=""
@@ -685,68 +552,57 @@
                 font-weight: 600;
               "
             ></div>
+            <h5 id="viewStudentFullName" class="mb-0"></h5>
+            <p class="text-muted" id="viewStudentIdDisplay"></p>
           </div>
           <div class="col-md-8">
+            <h6 class="text-muted mb-3">Personal Information</h6>
+
+            <div class="row mb-3">
+              <div class="col-6">
+                <label class="form-label fw-bold mb-1">First Name</label>
+                <p class="form-control-plaintext" id="viewStudentFirstName"></p>
+              </div>
+              <div class="col-6">
+                <label class="form-label fw-bold mb-1">Last Name</label>
+                <p class="form-control-plaintext" id="viewStudentLastName"></p>
+              </div>
+            </div>
+
+            <div class="row mb-4">
+              <div class="col-6">
+                <label class="form-label fw-bold mb-1">Gender</label>
+                <p class="form-control-plaintext" id="viewStudentGender"></p>
+              </div>
+              <div class="col-6">
+                <label class="form-label fw-bold mb-1">Year Level</label>
+                <p class="form-control-plaintext" id="viewStudentYearLevel"></p>
+              </div>
+            </div>
+            <h6 class="text-muted mb-3">Academic Information</h6>
+
             <div class="mb-3">
-              <label class="form-label">ID Number:</label>
-              <input
-                type="text"
-                class="form-control"
-                id="viewStudentId"
-                readonly
-              />
+              <label class="form-label fw-bold mb-1">Program</label>
+              <p class="form-control-plaintext" id="viewStudentProgramFull"></p>
             </div>
 
             <div class="row mb-3">
               <div class="col-6">
-                <label class="form-label">First Name:</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="viewStudentFirstName"
-                  readonly
-                />
+                <label class="form-label fw-bold mb-1">Program Code</label>
+                <p class="form-control-plaintext" id="viewStudentProgram"></p>
               </div>
               <div class="col-6">
-                <label class="form-label">Last Name:</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="viewStudentLastName"
-                  readonly
-                />
+                <label class="form-label fw-bold mb-1">College Code</label>
+                <p
+                  class="form-control-plaintext"
+                  id="viewStudentCollegeCode"
+                ></p>
               </div>
             </div>
 
             <div class="mb-3">
-              <label class="form-label">Program Code:</label>
-              <input
-                type="text"
-                class="form-control"
-                id="viewStudentProgram"
-                readonly
-              />
-            </div>
-
-            <div class="row mb-3">
-              <div class="col-6">
-                <label class="form-label">Year Level:</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="viewStudentYearLevel"
-                  readonly
-                />
-              </div>
-              <div class="col-6">
-                <label class="form-label">Gender:</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="viewStudentGender"
-                  readonly
-                />
-              </div>
+              <label class="form-label fw-bold mb-1">College</label>
+              <p class="form-control-plaintext" id="viewStudentCollegeName"></p>
             </div>
           </div>
         </div>
