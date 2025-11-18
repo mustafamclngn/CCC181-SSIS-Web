@@ -229,7 +229,9 @@
               >
                 <option value="" disabled selected>Select a program</option>
                 {% for program in programs %}
-                <option value="{{ program.code }}">{{ program.code }}</option>
+                <option value="{{ program.code }}">
+                  {{ program.code }} - {{ program.name }}
+                </option>
                 {% endfor %}
               </select>
             </div>
@@ -411,7 +413,9 @@
               >
                 <option value="" disabled>Select a program</option>
                 {% for program in programs %}
-                <option value="{{ program.code }}">{{ program.code }}</option>
+                <option value="{{ program.code }}">
+                  {{ program.code }} - {{ program.name }}
+                </option>
                 {% endfor %}
               </select>
             </div>
