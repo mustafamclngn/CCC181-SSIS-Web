@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
-from wtforms.validators import DataRequired, Email, EqualTo, Length, ValidationError
+from wtforms.validators import DataRequired, Regexp, EqualTo, Length, ValidationError
 from app.database import get_db
 
 class RegisterForm(FlaskForm):
@@ -10,7 +10,14 @@ class RegisterForm(FlaskForm):
     )
     email = StringField(
         "Email",
-        validators=[DataRequired(), Length(min=3, max=50)]
+        validators=[
+            DataRequired(),
+            Regexp(
+                r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+                message="Please enter a valid email address"
+            ),
+            Length(min=3, max=50)
+        ]
     )
     password = PasswordField(
         "Password",
