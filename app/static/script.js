@@ -463,6 +463,186 @@ $(document).ready(function () {
   // STUDENTS PAGE
   // ================================
 
+  // ================================
+  // STUDENTS PAGE
+  // ================================
+
+  // register student image function
+  $(document).ready(function () {
+    const dropZone = document.getElementById("dropZone");
+    const fileInput = document.getElementById("studentImage");
+    const dropZoneContent = document.getElementById("dropZoneContent");
+    const imagePreview = document.getElementById("imagePreview");
+    const previewImg = document.getElementById("previewImg");
+    const fileName = document.getElementById("fileName");
+    const removeImageBtn = document.getElementById("removeImage");
+
+    if (dropZone && fileInput) {
+      dropZone.addEventListener("click", (e) => {
+        if (
+          e.target.id !== "removeImage" &&
+          !e.target.closest("#removeImage")
+        ) {
+          fileInput.click();
+        }
+      });
+
+      dropZone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropZone.classList.add("border-primary", "bg-light");
+      });
+
+      dropZone.addEventListener("dragleave", () => {
+        dropZone.classList.remove("border-primary", "bg-light");
+      });
+
+      dropZone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropZone.classList.remove("border-primary", "bg-light");
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          fileInput.files = files;
+          handleFileSelect(files[0]);
+        }
+      });
+
+      fileInput.addEventListener("change", (e) => {
+        if (e.target.files.length > 0) {
+          handleFileSelect(e.target.files[0]);
+        }
+      });
+
+      function handleFileSelect(file) {
+        if (file) {
+          const maxSize = 5 * 1024 * 1024;
+          if (file.size > maxSize) {
+            showToast("Image file size must be less than 5MB", "error");
+            fileInput.value = "";
+            return;
+          }
+
+          const allowedTypes = ["image/png", "image/jpeg", "image/jpg"];
+          if (!allowedTypes.includes(file.type)) {
+            showToast("Only PNG, JPG, and JPEG files are allowed", "error");
+            fileInput.value = "";
+            return;
+          }
+
+          if (file.type.startsWith("image/")) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              previewImg.src = e.target.result;
+              fileName.textContent = file.name;
+              dropZoneContent.classList.add("d-none");
+              imagePreview.classList.remove("d-none");
+            };
+            reader.readAsDataURL(file);
+          }
+        }
+      }
+
+      removeImageBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        fileInput.value = "";
+        previewImg.src = "";
+        fileName.textContent = "";
+        imagePreview.classList.add("d-none");
+        dropZoneContent.classList.remove("d-none");
+      });
+    }
+
+    // edit student image function
+    const editDropZone = document.getElementById("editDropZone");
+    const editFileInput = document.getElementById("editStudentImage");
+    const editDropZoneContent = document.getElementById("editDropZoneContent");
+    const editImagePreview = document.getElementById("editImagePreview");
+    const editPreviewImg = document.getElementById("editPreviewImg");
+    const editFileName = document.getElementById("editFileName");
+    const editRemoveImageBtn = document.getElementById("editRemoveImage");
+
+    if (editDropZone && editFileInput) {
+      editDropZone.addEventListener("click", (e) => {
+        if (
+          e.target.id !== "editRemoveImage" &&
+          !e.target.closest("#editRemoveImage")
+        ) {
+          editFileInput.click();
+        }
+      });
+
+      editDropZone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        editDropZone.classList.add("border-primary", "bg-light");
+      });
+
+      editDropZone.addEventListener("dragleave", () => {
+        editDropZone.classList.remove("border-primary", "bg-light");
+      });
+
+      editDropZone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        editDropZone.classList.remove("border-primary", "bg-light");
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          editFileInput.files = files;
+          handleEditFileSelect(files[0]);
+        }
+      });
+
+      editFileInput.addEventListener("change", (e) => {
+        if (e.target.files.length > 0) {
+          handleEditFileSelect(e.target.files[0]);
+        }
+      });
+
+      function handleEditFileSelect(file) {
+        if (file) {
+          const maxSize = 5 * 1024 * 1024;
+          if (file.size > maxSize) {
+            showToast("Image file size must be less than 5MB", "error");
+            editFileInput.value = "";
+            return;
+          }
+
+          const allowedTypes = ["image/png", "image/jpeg", "image/jpg"];
+          if (!allowedTypes.includes(file.type)) {
+            showToast("Only PNG, JPG, and JPEG files are allowed", "error");
+            editFileInput.value = "";
+            return;
+          }
+
+          if (file.type.startsWith("image/")) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              editPreviewImg.src = e.target.result;
+              editFileName.textContent = file.name;
+              editDropZoneContent.classList.add("d-none");
+              editImagePreview.classList.remove("d-none");
+            };
+            reader.readAsDataURL(file);
+          }
+        }
+      }
+
+      editRemoveImageBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        editFileInput.value = "";
+        editPreviewImg.src = "";
+        editFileName.textContent = "";
+        editImagePreview.classList.add("d-none");
+        editDropZoneContent.classList.remove("d-none");
+      });
+
+      $("#editStudentModal").on("hidden.bs.modal", function () {
+        editFileInput.value = "";
+        editPreviewImg.src = "";
+        editFileName.textContent = "";
+        editImagePreview.classList.add("d-none");
+        editDropZoneContent.classList.remove("d-none");
+      });
+    }
+  });
+
   // REGISTER
   $("#idNumber").on("input", function () {
     let value = this.value.toUpperCase();
@@ -730,7 +910,6 @@ $(document).on("click", "#data-table tbody tr", function (e) {
   }
 
   const row = $(this);
-
   const imageCell = row.find("td:eq(0)");
   const imageElement = imageCell.find("img");
   const imageUrl = imageElement.length ? imageElement.attr("src") : null;
@@ -740,13 +919,20 @@ $(document).on("click", "#data-table tbody tr", function (e) {
   const programCode = row.find("td:eq(4)").text().trim();
   const yearLevel = row.find("td:eq(5)").text().trim();
   const gender = row.find("td:eq(6)").text().trim();
+  const programName = row.attr("data-program-name") || "N/A";
+  const collegeCode = row.attr("data-college-code") || "N/A";
+  const collegeName = row.attr("data-college-name") || "N/A";
 
-  $("#viewStudentId").val(idNumber);
-  $("#viewStudentFirstName").val(firstName);
-  $("#viewStudentLastName").val(lastName);
-  $("#viewStudentProgram").val(programCode);
-  $("#viewStudentYearLevel").val(yearLevel);
-  $("#viewStudentGender").val(gender);
+  $("#viewStudentId").text(idNumber);
+  $("#viewStudentFirstName").text(firstName);
+  $("#viewStudentLastName").text(lastName);
+  $("#viewStudentProgram").text(programCode);
+  $("#viewStudentProgramFull").text(programName);
+  $("#viewStudentCollegeCode").text(collegeCode);
+  $("#viewStudentCollegeName").text(collegeName);
+  $("#viewStudentYearLevel").text(yearLevel);
+  $("#viewStudentGender").text(gender);
+
   $("#viewStudentImage").addClass("d-none");
   $("#viewStudentInitials").addClass("d-none").removeClass("d-flex");
 
