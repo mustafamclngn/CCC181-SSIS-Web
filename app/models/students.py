@@ -3,6 +3,48 @@ from psycopg2.extras import RealDictCursor
 
 class StudentModel:
     @staticmethod
+    def get_student_by_id(id_number):
+        db = get_db()
+        cursor = db.cursor(cursor_factory=RealDictCursor)
+        try:
+            cursor.execute("""
+                SELECT 
+                    s.idnumber,
+                    s.firstname,
+                    s.lastname,
+                    s.gender,
+                    s.yearlevel,
+                    s.programcode,
+                    s.imageurl,
+                    p.programname,
+                    c.collegecode,
+                    c.collegename
+                FROM students s
+                LEFT JOIN programs p ON s.programcode = p.programcode
+                LEFT JOIN colleges c ON p.collegecode = c.collegecode
+                WHERE s.idnumber = %s
+            """, (id_number,))
+            
+            student_data = cursor.fetchone()
+            
+            if student_data:
+                return {
+                    "id_number": student_data['idnumber'],
+                    "first_name": student_data['firstname'],
+                    "last_name": student_data['lastname'],
+                    "gender": student_data['gender'],
+                    "year_level": student_data['yearlevel'],
+                    "program_code": student_data['programcode'],
+                    "image_url": student_data['imageurl'],
+                    "programname": student_data['programname'],
+                    "collegecode": student_data['collegecode'],
+                    "collegename": student_data['collegename']
+                }
+            return None
+        finally:
+            cursor.close()
+        
+    @staticmethod
     def get_students_with_programs():
         db = get_db()
         cursor = db.cursor(cursor_factory=RealDictCursor)
