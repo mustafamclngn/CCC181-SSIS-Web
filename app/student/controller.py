@@ -14,9 +14,64 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 MAX_FILE_SIZE = 5 * 1024 * 1024
+BUCKET_NAME = 'students-images'
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def get_default_avatar_url():
+    try:
+        return supabase.storage.from_(BUCKET_NAME).get_public_url('default-avatar.png')
+    except Exception as e:
+        print(f"Error getting default avatar: {e}")
+        return None
+
+def upload_student_image(file, student_id):
+    if not file or file.filename == '' or not allowed_file(file.filename):
+        return None
+    
+    file.seek(0, os.SEEK_END)
+    file_size = file.tell()
+    file.seek(0)
+    
+    if file_size > MAX_FILE_SIZE:
+        raise ValueError('Image file size must be less than 5MB')
+    
+    file_ext = os.path.splitext(secure_filename(file.filename))[1]
+    unique_filename = f"{student_id}_{uuid.uuid4().hex}{file_ext}"
+    
+    file_bytes = file.read()
+    
+    try:
+        storage_response = supabase.storage.from_(BUCKET_NAME).upload(
+            path=unique_filename,
+            file=file_bytes,
+            file_options={"content-type": file.content_type}
+        )
+        
+        image_url = supabase.storage.from_(BUCKET_NAME).get_public_url(unique_filename)
+        return image_url
+        
+    except Exception as storage_error:
+        print(f"Storage error: {storage_error}")
+        raise Exception('Error uploading image to storage')
+
+def delete_student_image(image_url):
+    if not image_url:
+        return False
+    
+    try:
+        filename = image_url.split('/')[-1]
+        
+        if 'default-avatar' in filename:
+            return False
+        
+        supabase.storage.from_(BUCKET_NAME).remove([filename])
+        return True
+        
+    except Exception as e:
+        print(f"Error deleting image: {e}")
+        return False
 
 # ==============================
 # STUDENTS PAGE
@@ -26,12 +81,14 @@ def allowed_file(filename):
 def students():
     programs_list = StudentModel.get_all_programs()
     students_list = StudentModel.get_all_students()
+    default_avatar = get_default_avatar_url()
 
     return render_template(
         "students.html",
         page_title="Students",
         students=students_list,
-        programs=programs_list
+        programs=programs_list,
+        default_avatar=default_avatar
     )
 
 # ==============================
@@ -68,36 +125,20 @@ def register_student():
         return redirect(url_for("student.students"))
 
     image_url = None
-
     if 'student_image' in request.files:
         file = request.files['student_image']
-        
-        if file and file.filename != '' and allowed_file(file.filename):
-            file.seek(0, os.SEEK_END)
-            file_size = file.tell()
-            file.seek(0)
-            
-            if file_size > MAX_FILE_SIZE:
-                flash('Image file size must be less than 5MB', 'danger')
-                return redirect(url_for('student.students'))
-            
-            file_ext = os.path.splitext(secure_filename(file.filename))[1]
-            unique_filename = f"{id_number}_{uuid.uuid4().hex}{file_ext}"
-            
-            file_bytes = file.read()
-            
-            try:
-                storage_response = supabase.storage.from_('students-images').upload(
-                    path=unique_filename,
-                    file=file_bytes,
-                    file_options={"content-type": file.content_type}
-                )
-                
-                image_url = supabase.storage.from_('students-images').get_public_url(unique_filename)
-                
-            except Exception as storage_error:
-                print(f"Storage error: {storage_error}")
-                flash('Error uploading image', 'warning')
+        try:
+            image_url = upload_student_image(file, id_number)
+        except ValueError as e:
+            flash(str(e), 'danger')
+            return redirect(url_for('student.students'))
+        except Exception as e:
+            flash('Error uploading image', 'warning')
+            print(f"Upload error: {e}")
+
+    # if no image use default
+    if not image_url:
+        image_url = get_default_avatar_url()
 
     try:
         if StudentModel.check_student_exists(id_number):
@@ -129,37 +170,33 @@ def edit_student():
         flash("All fields are required.", "danger")
         return redirect(url_for("student.students"))
 
-    image_url = None
+    try:
+        current_student = StudentModel.get_student_by_id(original_id)
+        old_image_url = current_student.get('image_url') if current_student else None
+    except:
+        old_image_url = None
 
+    image_url = old_image_url
+    
     if 'student_image' in request.files:
         file = request.files['student_image']
-        
-        if file and file.filename != '' and allowed_file(file.filename):
-            file.seek(0, os.SEEK_END)
-            file_size = file.tell()
-            file.seek(0)
-            
-            if file_size > MAX_FILE_SIZE:
-                flash('Image file size must be less than 5MB', 'danger')
-                return redirect(url_for('student.students'))
-            
-            file_ext = os.path.splitext(secure_filename(file.filename))[1]
-            unique_filename = f"{id_number}_{uuid.uuid4().hex}{file_ext}"
-        
-            file_bytes = file.read()
-            
+        if file and file.filename != '':
             try:
-                storage_response = supabase.storage.from_('students-images').upload(
-                    path=unique_filename,
-                    file=file_bytes,
-                    file_options={"content-type": file.content_type}
-                )
+                if old_image_url and 'default-avatar' not in old_image_url:
+                    delete_student_image(old_image_url)
                 
-                image_url = supabase.storage.from_('students-images').get_public_url(unique_filename)
+                image_url = upload_student_image(file, id_number)
                 
-            except Exception as storage_error:
-                print(f"Storage error: {storage_error}")
+            except ValueError as e:
+                flash(str(e), 'danger')
+                return redirect(url_for('student.students'))
+            except Exception as e:
                 flash('Error uploading image', 'warning')
+                print(f"Upload error: {e}")
+
+    # if no image use default
+    if not image_url:
+        image_url = get_default_avatar_url()
 
     try:
         if StudentModel.check_student_exists(id_number, original_id):
@@ -186,6 +223,11 @@ def delete_student():
         return redirect(url_for("student.students"))
 
     try:
+        student = StudentModel.get_student_by_id(id_number)
+        if student and student.get('image_url'):
+            delete_student_image(student['image_url'])
+        
+        # delete student from db
         StudentModel.delete_student(id_number)
         flash("Student deleted successfully!", "success")
     except Exception as e:
