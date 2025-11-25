@@ -70,10 +70,9 @@
         data-college-name="{{ student.collegename or 'N/A' }}"
       >
         <td class="text-center">
-          {% if student.image_url %}
           <img
-            src="{{ student.image_url }}"
-            alt="{{ student.first_name }}"
+            src="{{ student.image_url if student.image_url else default_avatar }}"
+            alt="{{ student.first_name }} {{ student.last_name }}"
             class="rounded-circle"
             style="
               width: 45px;
@@ -81,15 +80,8 @@
               object-fit: cover;
               border: 2px solid #dee2e6;
             "
+            onerror="this.onerror=null; this.src='{{ default_avatar }}';"
           />
-          {% else %}
-          <div
-            class="rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white mx-auto"
-            style="width: 45px; height: 45px; font-size: 16px; font-weight: 600"
-          >
-            {{ student.first_name[0] }}{{ student.last_name[0] }}
-          </div>
-          {% endif %}
         </td>
         <td>{{ student.id_number }}</td>
         <td>{{ student.first_name }}</td>
