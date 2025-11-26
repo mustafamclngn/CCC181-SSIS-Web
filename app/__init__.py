@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from flask import Flask, render_template, url_for, request, redirect, session
 from flask_wtf.csrf import CSRFProtect
 
-from app.database import get_db, close_db
+from app.database import get_db, close_db, init_db_pool, close_db_pool
 
 from app.college import college_bp
 from app.program import program_bp
@@ -22,6 +22,10 @@ def create_app():
     app.config["SECRET_KEY"] = config.SECRET_KEY
     app.config["DATABASE_URL"] = config.DATABASE_URL
     app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=30)
+    init_db_pool(app.config["DATABASE_URL"])
+    
+    import atexit
+    atexit.register(close_db_pool)
 
     csrf = CSRFProtect(app)
     
