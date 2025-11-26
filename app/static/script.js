@@ -50,9 +50,10 @@ document.addEventListener("DOMContentLoaded", function () {
 $(document).ready(function () {
   const dataTable = $("#data-table").DataTable({
     pageLength: 10,
-    lengthChange: false,
+    lengthChange: true,
     searching: true,
-    dom: '<"row"<"col-sm-12"tr>><"row mt-3"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7 d-flex justify-content-end"p>>',
+    order: [],
+    dom: '<"row"<"col-sm-12"tr>><"row mt-3"<"col-sm-12 col-md-5 d-flex align-items-center gap-3"l i><"col-sm-12 col-md-7 d-flex justify-content-end"p>>',
     columnDefs: [
       {
         targets: -1,
@@ -890,10 +891,36 @@ $("#deleteProgramModal").on("hidden.bs.modal", function () {
 // reset students modals
 $("#registerStudentModal").on("hidden.bs.modal", function () {
   $("#registerStudentForm")[0].reset();
+
+  // reset register image field
+  const fileInput = document.getElementById("studentImage");
+  const previewImg = document.getElementById("previewImg");
+  const fileName = document.getElementById("fileName");
+  const imagePreview = document.getElementById("imagePreview");
+  const dropZoneContent = document.getElementById("dropZoneContent");
+
+  if (fileInput) fileInput.value = "";
+  if (previewImg) previewImg.src = "";
+  if (fileName) fileName.textContent = "";
+  if (imagePreview) imagePreview.classList.add("d-none");
+  if (dropZoneContent) dropZoneContent.classList.remove("d-none");
 });
 
 $("#editStudentModal").on("hidden.bs.modal", function () {
   $("#editStudentForm")[0].reset();
+
+  // reset edit image field
+  const editFileInput = document.getElementById("editStudentImage");
+  const editPreviewImg = document.getElementById("editPreviewImg");
+  const editFileName = document.getElementById("editFileName");
+  const editImagePreview = document.getElementById("editImagePreview");
+  const editDropZoneContent = document.getElementById("editDropZoneContent");
+
+  if (editFileInput) editFileInput.value = "";
+  if (editPreviewImg) editPreviewImg.src = "";
+  if (editFileName) editFileName.textContent = "";
+  if (editImagePreview) editImagePreview.classList.add("d-none");
+  if (editDropZoneContent) editDropZoneContent.classList.remove("d-none");
 });
 
 $("#deleteStudentModal").on("hidden.bs.modal", function () {
