@@ -464,10 +464,6 @@ $(document).ready(function () {
   // STUDENTS PAGE
   // ================================
 
-  // ================================
-  // STUDENTS PAGE
-  // ================================
-
   // register student image function
   $(document).ready(function () {
     const dropZone = document.getElementById("dropZone");
