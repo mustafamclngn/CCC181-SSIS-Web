@@ -572,79 +572,62 @@
           data-bs-dismiss="modal"
         ></button>
       </div>
-      <div class="modal-body">
-        <div class="row">
-          <div class="col-md-4 text-center mb-4 mb-md-0">
-            <img
-              id="viewStudentImage"
-              src=""
-              alt="Student Photo"
-              class="rounded-circle d-none mb-3"
-              style="width: 150px; height: 150px; object-fit: cover"
-            />
-            <div
-              id="viewStudentInitials"
-              class="rounded-circle bg-secondary d-none align-items-center justify-content-center text-white mx-auto mb-3"
-              style="
-                width: 150px;
-                height: 150px;
-                font-size: 48px;
-                font-weight: 600;
-              "
-            ></div>
-            <h5 id="viewStudentFullName" class="mb-0"></h5>
-            <p class="text-muted" id="viewStudentIdDisplay"></p>
+
+      <div class="modal-body" style="max-height: 75vh; overflow-y: auto">
+        <div class="text-center mb-4">
+          <img
+            id="viewStudentImage"
+            src=""
+            alt="Student Photo"
+            class="rounded-circle d-none"
+            style="
+              width: 150px;
+              height: 150px;
+              object-fit: cover;
+              border: 3px solid #dee2e6;
+            "
+          />
+
+          <div
+            id="viewStudentInitials"
+            class="rounded-circle bg-secondary text-white fw-bold d-none d-flex align-items-center justify-content-center"
+            style="width: 150px; height: 150px; font-size: 48px"
+          ></div>
+
+          <p class="text-muted mt-2 mb-0" id="viewStudentId"></p>
+        </div>
+        <hr />
+        <h6 class="text-muted mb-3">Student Information</h6>
+
+        <div class="row mb-3">
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">First Name</label>
+            <div class="form-control bg-light" id="viewStudentFirstName"></div>
           </div>
-          <div class="col-md-8">
-            <h6 class="text-muted mb-3">Personal Information</h6>
-
-            <div class="row mb-3">
-              <div class="col-6">
-                <label class="form-label fw-bold mb-1">First Name</label>
-                <p class="form-control-plaintext" id="viewStudentFirstName"></p>
-              </div>
-              <div class="col-6">
-                <label class="form-label fw-bold mb-1">Last Name</label>
-                <p class="form-control-plaintext" id="viewStudentLastName"></p>
-              </div>
-            </div>
-
-            <div class="row mb-4">
-              <div class="col-6">
-                <label class="form-label fw-bold mb-1">Gender</label>
-                <p class="form-control-plaintext" id="viewStudentGender"></p>
-              </div>
-              <div class="col-6">
-                <label class="form-label fw-bold mb-1">Year Level</label>
-                <p class="form-control-plaintext" id="viewStudentYearLevel"></p>
-              </div>
-            </div>
-            <h6 class="text-muted mb-3">Academic Information</h6>
-
-            <div class="mb-3">
-              <label class="form-label fw-bold mb-1">Program</label>
-              <p class="form-control-plaintext" id="viewStudentProgramFull"></p>
-            </div>
-
-            <div class="row mb-3">
-              <div class="col-6">
-                <label class="form-label fw-bold mb-1">Program Code</label>
-                <p class="form-control-plaintext" id="viewStudentProgram"></p>
-              </div>
-              <div class="col-6">
-                <label class="form-label fw-bold mb-1">College Code</label>
-                <p
-                  class="form-control-plaintext"
-                  id="viewStudentCollegeCode"
-                ></p>
-              </div>
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label fw-bold mb-1">College</label>
-              <p class="form-control-plaintext" id="viewStudentCollegeName"></p>
-            </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Last Name</label>
+            <div class="form-control bg-light" id="viewStudentLastName"></div>
           </div>
+        </div>
+
+        <div class="row mb-4">
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Gender</label>
+            <div class="form-control bg-light" id="viewStudentGender"></div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Year Level</label>
+            <div class="form-control bg-light" id="viewStudentYearLevel"></div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold">Program</label>
+          <div class="form-control bg-light" id="viewStudentProgramFull"></div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-bold">College</label>
+          <div class="form-control bg-light" id="viewStudentCollegeName"></div>
         </div>
       </div>
     </div>

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
 
     <script>
       if (sessionStorage.getItem("sidebarCollapsed") === "true") {
@@ -97,8 +97,19 @@
           </li>
         </ul>
 
-        <!-- log out -->
-        <ul class="sidebar-list logout-list">
+        <!-- user profile and logout section -->
+        <ul class="sidebar-list bottom-section">
+          <li class="sidebar-item user-profile-item">
+            <div class="sidebar-link user-profile-link">
+              <i class="bi bi-person-circle fs-1"></i>
+              <span class="user-info">
+                <div class="user-name">
+                  {{ session.get('username', 'User') }}
+                </div>
+                </div>
+              </span>
+            </div>
+          </li>
           <li class="sidebar-item">
             <a
               href="#"
