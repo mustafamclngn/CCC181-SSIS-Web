@@ -615,6 +615,7 @@ $(document).ready(function () {
               editFileName.textContent = file.name;
               editDropZoneContent.classList.add("d-none");
               editImagePreview.classList.remove("d-none");
+              $("#removeImageFlag").val("0");
             };
             reader.readAsDataURL(file);
           }
@@ -628,6 +629,7 @@ $(document).ready(function () {
         editFileName.textContent = "";
         editImagePreview.classList.add("d-none");
         editDropZoneContent.classList.remove("d-none");
+        $("#removeImageFlag").val("1");
       });
 
       $("#editStudentModal").on("hidden.bs.modal", function () {
@@ -751,6 +753,7 @@ $(document).ready(function () {
       $("#editDropZoneContent").removeClass("d-none");
     }
     $("#editStudentImage").val("");
+    $("#removeImageFlag").val("0");
 
     $("#editStudentModal").modal("show");
   });
