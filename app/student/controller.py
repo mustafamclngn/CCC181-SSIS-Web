@@ -4,6 +4,7 @@ from app.auth_decorators import login_required
 from werkzeug.utils import secure_filename
 import os
 import uuid
+import psycopg2 
 
 student_bp = Blueprint("student", __name__, template_folder="templates")
 
@@ -136,17 +137,17 @@ def register_student():
             flash('Error uploading image', 'warning')
             print(f"Upload error: {e}")
 
-    # if no image use default
     if not image_url:
         image_url = get_default_avatar_url()
 
     try:
-        if StudentModel.check_student_exists(id_number):
-            flash("Student ID already exists.", "warning")
-            return redirect(url_for("student.students"))
-
         StudentModel.create_student(id_number, first_name, last_name, gender, year_level, program_code, image_url)
         flash("Student registered successfully!", "success")
+    except psycopg2.IntegrityError as e:
+        if 'already exists' in str(e) or 'duplicate key' in str(e):
+            flash("Student ID already exists.", "warning")
+        else:
+            flash(f"Database error: {str(e)}", "danger")
     except Exception as e:
         flash(f"Error: {str(e)}", "danger")
 
@@ -165,6 +166,7 @@ def edit_student():
     gender = request.form.get("gender", "").strip().title()
     year_level = request.form.get("year_level", "").strip()
     program_code = request.form.get("program_code", "").strip().upper()
+    remove_image = request.form.get("remove_image", "0") == "1"  # ADD THIS LINE
 
     if not original_id or not id_number or not first_name or not last_name or not gender or not year_level or not program_code:
         flash("All fields are required.", "danger")
@@ -178,7 +180,11 @@ def edit_student():
 
     image_url = old_image_url
     
-    if 'student_image' in request.files:
+    if remove_image:
+        if old_image_url and 'default-avatar' not in old_image_url:
+            delete_student_image(old_image_url)
+        image_url = get_default_avatar_url()
+    elif 'student_image' in request.files:
         file = request.files['student_image']
         if file and file.filename != '':
             try:
@@ -194,17 +200,17 @@ def edit_student():
                 flash('Error uploading image', 'warning')
                 print(f"Upload error: {e}")
 
-    # if no image use default
     if not image_url:
         image_url = get_default_avatar_url()
 
     try:
-        if StudentModel.check_student_exists(id_number, original_id):
-            flash("A student with this ID already exists.", "warning")
-            return redirect(url_for("student.students"))
-
         StudentModel.update_student(original_id, id_number, first_name, last_name, gender, year_level, program_code, image_url)
         flash("Student updated successfully!", "success")
+    except psycopg2.IntegrityError as e:
+        if 'already exists' in str(e) or 'duplicate key' in str(e):
+            flash("A student with this ID already exists.", "warning")
+        else:
+            flash(f"Database error: {str(e)}", "danger")
     except Exception as e:
         flash(f"Error: {str(e)}", "danger")
 
