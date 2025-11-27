@@ -464,7 +464,11 @@ $(document).ready(function () {
   // STUDENTS PAGE
   // ================================
 
-  // register student image function
+  // ================================
+  // STUDENTS PAGE - IMAGE UPLOAD
+  // ================================
+
+  // Register student image function
   $(document).ready(function () {
     const dropZone = document.getElementById("dropZone");
     const fileInput = document.getElementById("studentImage");
@@ -473,15 +477,18 @@ $(document).ready(function () {
     const previewImg = document.getElementById("previewImg");
     const fileName = document.getElementById("fileName");
     const removeImageBtn = document.getElementById("removeImage");
+    const chooseImageBtn = document.getElementById("chooseImageBtn");
 
-    if (dropZone && fileInput) {
-      dropZone.addEventListener("click", (e) => {
-        if (
-          e.target.id !== "removeImage" &&
-          !e.target.closest("#removeImage")
-        ) {
-          fileInput.click();
-        }
+    if (dropZone && fileInput && chooseImageBtn) {
+      // Choose Image button click
+      chooseImageBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        fileInput.click();
+      });
+
+      // Dropzone click (for drag and drop area only)
+      dropZone.addEventListener("click", () => {
+        fileInput.click();
       });
 
       dropZone.addEventListener("dragover", (e) => {
@@ -532,6 +539,7 @@ $(document).ready(function () {
               fileName.textContent = file.name;
               dropZoneContent.classList.add("d-none");
               imagePreview.classList.remove("d-none");
+              removeImageBtn.classList.remove("d-none"); // Show remove button
             };
             reader.readAsDataURL(file);
           }
@@ -539,16 +547,18 @@ $(document).ready(function () {
       }
 
       removeImageBtn.addEventListener("click", (e) => {
+        e.preventDefault();
         e.stopPropagation();
         fileInput.value = "";
         previewImg.src = "";
         fileName.textContent = "";
         imagePreview.classList.add("d-none");
         dropZoneContent.classList.remove("d-none");
+        removeImageBtn.classList.add("d-none"); // Hide remove button
       });
     }
 
-    // edit student image function
+    // Edit student image function
     const editDropZone = document.getElementById("editDropZone");
     const editFileInput = document.getElementById("editStudentImage");
     const editDropZoneContent = document.getElementById("editDropZoneContent");
@@ -556,15 +566,18 @@ $(document).ready(function () {
     const editPreviewImg = document.getElementById("editPreviewImg");
     const editFileName = document.getElementById("editFileName");
     const editRemoveImageBtn = document.getElementById("editRemoveImage");
+    const editChooseImageBtn = document.getElementById("editChooseImageBtn");
 
-    if (editDropZone && editFileInput) {
-      editDropZone.addEventListener("click", (e) => {
-        if (
-          e.target.id !== "editRemoveImage" &&
-          !e.target.closest("#editRemoveImage")
-        ) {
-          editFileInput.click();
-        }
+    if (editDropZone && editFileInput && editChooseImageBtn) {
+      // Choose Image button click
+      editChooseImageBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        editFileInput.click();
+      });
+
+      // Dropzone click (for drag and drop area only)
+      editDropZone.addEventListener("click", () => {
+        editFileInput.click();
       });
 
       editDropZone.addEventListener("dragover", (e) => {
@@ -615,6 +628,7 @@ $(document).ready(function () {
               editFileName.textContent = file.name;
               editDropZoneContent.classList.add("d-none");
               editImagePreview.classList.remove("d-none");
+              editRemoveImageBtn.classList.remove("d-none"); // Show remove button
               $("#removeImageFlag").val("0");
             };
             reader.readAsDataURL(file);
@@ -623,12 +637,14 @@ $(document).ready(function () {
       }
 
       editRemoveImageBtn.addEventListener("click", (e) => {
+        e.preventDefault();
         e.stopPropagation();
         editFileInput.value = "";
         editPreviewImg.src = "";
         editFileName.textContent = "";
         editImagePreview.classList.add("d-none");
         editDropZoneContent.classList.remove("d-none");
+        editRemoveImageBtn.classList.add("d-none"); // Hide remove button
         $("#removeImageFlag").val("1");
       });
 
@@ -638,6 +654,7 @@ $(document).ready(function () {
         editFileName.textContent = "";
         editImagePreview.classList.add("d-none");
         editDropZoneContent.classList.remove("d-none");
+        editRemoveImageBtn.classList.add("d-none"); // Hide remove button on modal close
       });
     }
   });
@@ -746,11 +763,13 @@ $(document).ready(function () {
       $("#editFileName").text("Current image");
       $("#editDropZoneContent").addClass("d-none");
       $("#editImagePreview").removeClass("d-none");
+      $("#editRemoveImage").removeClass("d-none");
     } else {
       $("#editPreviewImg").attr("src", "");
       $("#editFileName").text("");
       $("#editImagePreview").addClass("d-none");
       $("#editDropZoneContent").removeClass("d-none");
+      $("#editRemoveImage").addClass("d-none");
     }
     $("#editStudentImage").val("");
     $("#removeImageFlag").val("0");
