@@ -741,7 +741,7 @@ $(document).ready(function () {
     $("#editStudentProgram").val(programCode);
     $("#editStudentYearLevel").val(yearLevel);
     $("#editStudentGender").val(gender);
-    if (imageUrl) {
+    if (imageUrl && !imageUrl.includes("default-avatar")) {
       $("#editPreviewImg").attr("src", imageUrl);
       $("#editFileName").text("Current image");
       $("#editDropZoneContent").addClass("d-none");
