@@ -7,10 +7,15 @@ class UserModel:
         db = get_db()
         cursor = db.cursor()
         try:
-            cursor.execute("SELECT id, password FROM users WHERE username = %s", (username,))
+            cursor.execute("SELECT id, username, email, password FROM users WHERE username = %s", (username,))
             user = cursor.fetchone()
             if user:
-                return {"id": user[0], "password": user[1]}
+                return {
+                    "id": user[0], 
+                    "username": user[1],
+                    "email": user[2],
+                    "password": user[3]
+                }
             return None
         finally:
             cursor.close()

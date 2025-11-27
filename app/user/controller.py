@@ -21,6 +21,8 @@ def login():
 
         if user and check_password_hash(user["password"], password):
             session["user_id"] = user["id"]
+            session["username"] = user["username"]
+            session["email"] = user["email"]
             session.permanent = form.remember_me.data
             flash("Welcome back!", "success")
             return redirect(url_for("dashboard.dashboard"))
