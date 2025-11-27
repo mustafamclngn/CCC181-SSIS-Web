@@ -12,7 +12,7 @@
   <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
       <h3>Student Records</h3>
-      <p class="text-muted mb-0">View all registered students</p>
+      <p class="text-muted mb-0">View and Manage all registered students</p>
     </div>
     <a
       href="#"
@@ -127,17 +127,7 @@
             ></button>
           </div>
           <div class="modal-body" style="max-height: 70vh; overflow-y: auto">
-            <div class="mb-3">
-              <label for="idNumber" class="form-label">ID Number</label>
-              <input
-                type="text"
-                class="form-control"
-                id="idNumber"
-                name="id_number"
-                placeholder="Enter ID number"
-                required
-              />
-            </div>
+            <!-- Student Picture Section (Now First) -->
             <div class="mb-3">
               <label for="studentImage" class="form-label"
                 >Student Picture</label
@@ -145,7 +135,7 @@
               <div
                 class="border rounded p-3 text-center"
                 id="dropZone"
-                style="border-style: dashed !important; cursor: pointer"
+                style="border-style: dashed !important"
               >
                 <input
                   type="file"
@@ -155,10 +145,13 @@
                   accept="image/*"
                 />
                 <div id="dropZoneContent">
-                  <button type="button" class="btn btn-success">
-                    Choose Image
-                  </button>
-                  <p class="mb-0 mt-2">
+                  <div class="mb-2">
+                    <i
+                      class="bi bi-image"
+                      style="font-size: 48px; color: #6c757d"
+                    ></i>
+                  </div>
+                  <p class="mb-2">
                     <small class="text-muted"
                       >PNG, JPG or JPEG (MAX. 5MB)</small
                     >
@@ -170,22 +163,46 @@
                     src=""
                     alt="Preview"
                     class="img-thumbnail"
-                    style="max-height: 120px"
+                    style="max-height: 200px"
                   />
                   <p class="mt-2 mb-0">
                     <small id="fileName" class="text-muted"></small>
                   </p>
-                  <button
-                    type="button"
-                    class="btn btn-sm btn-danger mt-2"
-                    id="removeImage"
-                  >
-                    <i class="bi bi-x-circle"></i> Remove
-                  </button>
                 </div>
+              </div>
+              <!-- Buttons below the box -->
+              <div class="mt-2 d-flex gap-2">
+                <button
+                  type="button"
+                  class="btn btn-success btn-sm flex-grow-1"
+                  id="chooseImageBtn"
+                >
+                  <i class="bi bi-upload"></i> Choose Image
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-danger btn-sm d-none flex-grow-1"
+                  id="removeImage"
+                >
+                  <i class="bi bi-x-circle"></i> Remove Photo
+                </button>
               </div>
             </div>
 
+            <!-- ID Number -->
+            <div class="mb-3">
+              <label for="idNumber" class="form-label">ID Number</label>
+              <input
+                type="text"
+                class="form-control"
+                id="idNumber"
+                name="id_number"
+                placeholder="Enter ID number"
+                required
+              />
+            </div>
+
+            <!-- Name Fields -->
             <div class="row mb-3">
               <div class="col-6">
                 <label for="firstName" class="form-label">First Name</label>
@@ -211,6 +228,7 @@
               </div>
             </div>
 
+            <!-- Program -->
             <div class="mb-3">
               <label for="programCode" class="form-label">Program</label>
               <select
@@ -228,6 +246,7 @@
               </select>
             </div>
 
+            <!-- Year Level and Gender -->
             <div class="row mb-3">
               <div class="col-6">
                 <label for="yearLevel" class="form-label">Year Level</label>
@@ -313,17 +332,7 @@
               value="0"
             />
 
-            <div class="mb-3">
-              <label for="editStudentId" class="form-label">ID Number</label>
-              <input
-                type="text"
-                class="form-control"
-                id="editStudentId"
-                name="id_number"
-                placeholder="Enter ID number"
-                required
-              />
-            </div>
+            <!-- Student Picture Section (Now First) -->
             <div class="mb-3">
               <label for="editStudentImage" class="form-label"
                 >Student Picture</label
@@ -331,7 +340,7 @@
               <div
                 class="border rounded p-3 text-center"
                 id="editDropZone"
-                style="border-style: dashed !important; cursor: pointer"
+                style="border-style: dashed !important"
               >
                 <input
                   type="file"
@@ -341,10 +350,13 @@
                   accept="image/*"
                 />
                 <div id="editDropZoneContent">
-                  <button type="button" class="btn btn-success">
-                    Choose Image
-                  </button>
-                  <p class="mb-0 mt-2">
+                  <div class="mb-2">
+                    <i
+                      class="bi bi-image"
+                      style="font-size: 48px; color: #6c757d"
+                    ></i>
+                  </div>
+                  <p class="mb-2">
                     <small class="text-muted"
                       >PNG, JPG or JPEG (MAX. 5MB)</small
                     >
@@ -356,22 +368,46 @@
                     src=""
                     alt="Preview"
                     class="img-thumbnail"
-                    style="max-height: 120px"
+                    style="max-height: 200px"
                   />
                   <p class="mt-2 mb-0">
                     <small id="editFileName" class="text-muted"></small>
                   </p>
-                  <button
-                    type="button"
-                    class="btn btn-sm btn-danger mt-2"
-                    id="editRemoveImage"
-                  >
-                    <i class="bi bi-x-circle"></i> Remove
-                  </button>
                 </div>
+              </div>
+              <!-- Buttons below the box -->
+              <div class="mt-2 d-flex gap-2">
+                <button
+                  type="button"
+                  class="btn btn-success btn-sm flex-grow-1"
+                  id="editChooseImageBtn"
+                >
+                  <i class="bi bi-upload"></i> Choose Image
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-danger btn-sm d-none flex-grow-1"
+                  id="editRemoveImage"
+                >
+                  <i class="bi bi-x-circle"></i> Remove Photo
+                </button>
               </div>
             </div>
 
+            <!-- ID Number -->
+            <div class="mb-3">
+              <label for="editStudentId" class="form-label">ID Number</label>
+              <input
+                type="text"
+                class="form-control"
+                id="editStudentId"
+                name="id_number"
+                placeholder="Enter ID number"
+                required
+              />
+            </div>
+
+            <!-- Name Fields -->
             <div class="row mb-3">
               <div class="col-6">
                 <label for="editStudentFirstName" class="form-label"
@@ -401,6 +437,7 @@
               </div>
             </div>
 
+            <!-- Program -->
             <div class="mb-3">
               <label for="editStudentProgram" class="form-label">Program</label>
               <select
@@ -418,6 +455,7 @@
               </select>
             </div>
 
+            <!-- Year Level and Gender -->
             <div class="row mb-3">
               <div class="col-6">
                 <label for="editStudentYearLevel" class="form-label"
