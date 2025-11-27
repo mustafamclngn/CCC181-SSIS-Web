@@ -48,18 +48,30 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 $(document).ready(function () {
+  const isStudentPage =
+    $("#data-table thead th:first").text().trim() === "Photo";
+
+  let columnDefs = [
+    {
+      targets: -1,
+      orderable: false,
+    },
+  ];
+
+  if (isStudentPage) {
+    columnDefs.push({
+      targets: 0,
+      orderable: false,
+    });
+  }
+
   const dataTable = $("#data-table").DataTable({
     pageLength: 10,
     lengthChange: true,
     searching: true,
     order: [],
     dom: '<"row"<"col-sm-12"tr>><"row mt-3"<"col-sm-12 col-md-5 d-flex align-items-center gap-3"l i><"col-sm-12 col-md-7 d-flex justify-content-end"p>>',
-    columnDefs: [
-      {
-        targets: -1,
-        orderable: false,
-      },
-    ],
+    columnDefs: columnDefs,
   });
 
   const dashboardTable = $("#dashboard-table").DataTable({
@@ -67,6 +79,8 @@ $(document).ready(function () {
     lengthChange: false,
     searching: false,
   });
+
+  // rest of your code...
 
   // ================================
   // SEARCH FUNCTIONS
