@@ -48,118 +48,278 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 $(document).ready(function () {
-  const isStudentPage =
-    $("#data-table thead th:first").text().trim() === "Photo";
+  const dataTableElement = $("#data-table");
 
-  let columnDefs = [
-    {
-      targets: -1,
-      orderable: false,
-    },
-  ];
+  const firstHeaderText = dataTableElement.find("thead th:first").text().trim();
+  const isStudentPage = firstHeaderText === "Photo";
+  const isProgramPage = firstHeaderText === "Program Code";
+  const isCollegePage = firstHeaderText === "College Code";
+
+  let dataTable = null;
 
   if (isStudentPage) {
-    columnDefs.push({
-      targets: 0,
-      orderable: false,
+    // ===============================================
+    // STUDENTS DATATABLE - SERVER-SIDE
+    // ===============================================
+
+    let customFilters = {
+      gender: "",
+      year: "",
+      program: "",
+    };
+
+    dataTable = dataTableElement.DataTable({
+      processing: true,
+      serverSide: true,
+      language: {
+        processing: "",
+      },
+      ajax: {
+        url: "/students/data",
+        type: "GET",
+        data: function (d) {
+          d.filter_gender = customFilters.gender;
+          d.filter_year = customFilters.year;
+          d.filter_program = customFilters.program;
+        },
+      },
+      columns: [
+        {
+          data: "0",
+          render: function (data, type, row) {
+            // 'data' is the image URL from the server
+            // 'row.DT_RowData.default_avatar' is the fallback passed in metadata
+            const fallback = row.DT_RowData.default_avatar || "";
+            return `
+              <div class="text-center">
+                <img src="${data}" 
+                     alt="Student Photo" 
+                     class="rounded-circle" 
+                     style="width: 45px; height: 45px; object-fit: cover; border: 2px solid #dee2e6;"
+                     onerror="this.onerror=null; this.src='${fallback}';">
+              </div>`;
+          },
+        },
+        { data: "1" }, // ID
+        { data: "2" }, // First Name
+        { data: "3" }, // Last Name
+        {
+          data: "4",
+          render: function (data, type, row) {
+            return data ? data : "None";
+          },
+        },
+        { data: "5" }, // Year
+        { data: "6" }, // Gender
+        {
+          data: "7",
+          orderable: false,
+          render: function (data, type, row) {
+            return `
+              <a href="#" class="btn btn-primary btn-sm btn-edit">
+                <i class="bi bi-pencil-square"></i> Edit
+              </a>
+              <a href="#" class="btn btn-danger btn-sm btn-delete">
+                <i class="bi bi-trash"></i> Delete
+              </a>`;
+          },
+        },
+      ],
+      pageLength: 10,
+      lengthChange: true,
+      searching: true,
+      order: [
+        [3, "asc"],
+        [2, "asc"],
+      ],
+      dom: '<"row"<"col-sm-12"tr>><"row mt-3"<"col-sm-12 col-md-5 d-flex align-items-center gap-3"l i><"col-sm-12 col-md-7 d-flex justify-content-end"p>>',
+      columnDefs: [
+        {
+          targets: [0, 7],
+          orderable: false,
+        },
+      ],
+    });
+
+    $("#applyFiltersBtn").on("click", function () {
+      customFilters.gender = $("#filterGender").val();
+      customFilters.year = $("#filterYearLevel").val();
+      customFilters.program = $("#filterProgramCode").val();
+      dataTable.ajax.reload();
+    });
+
+    $("#clearFiltersBtn").on("click", function () {
+      $("#filterGender").val("");
+      $("#filterYearLevel").val("");
+      $("#filterProgramCode").val("");
+      customFilters.gender = "";
+      customFilters.year = "";
+      customFilters.program = "";
+      dataTable.ajax.reload();
+    });
+
+    const searchColumnStudent = $("#searchByColumnStudent");
+    const searchInputStudent = $("#customSearchStudent");
+
+    if (searchColumnStudent.length && searchInputStudent.length) {
+      searchInputStudent.off("keyup").on("keyup", function () {
+        dataTable.search(this.value).draw();
+      });
+
+      searchColumnStudent.off("change").on("change", function () {
+        searchInputStudent.val("");
+        dataTable.search("").draw();
+      });
+    }
+  } else if (isProgramPage) {
+    // ===============================================
+    // PROGRAMS DATATABLE
+    // ===============================================
+
+    dataTable = dataTableElement.DataTable({
+      processing: true,
+      serverSide: true,
+      language: {
+        processing: "",
+      },
+      ajax: {
+        url: "/programs/data",
+        type: "GET",
+      },
+      columns: [
+        { data: "code" },
+        { data: "name" },
+        {
+          data: "college_code",
+          render: function (data, type, row) {
+            return data ? data : "None";
+          },
+        },
+        {
+          data: null,
+          render: function (data, type, row) {
+            return `
+              <a href="#" class="btn btn-primary btn-sm btn-edit">
+                <i class="bi bi-pencil-square"></i> Edit
+              </a>
+              <a href="#" class="btn btn-danger btn-sm btn-delete">
+                <i class="bi bi-trash"></i> Delete
+              </a>
+             `;
+          },
+          orderable: false,
+        },
+      ],
+      pageLength: 10,
+      lengthChange: true,
+      searching: true,
+      order: [[0, "asc"]],
+      dom: '<"row"<"col-sm-12"tr>><"row mt-3"<"col-sm-12 col-md-5 d-flex align-items-center gap-3"l i><"col-sm-12 col-md-7 d-flex justify-content-end"p>>',
+    });
+
+    const searchColumnProgram = $("#searchByColumnProgram");
+    const searchInputProgram = $("#customSearchProgram");
+
+    if (searchColumnProgram.length && searchInputProgram.length) {
+      searchInputProgram.on("keyup", function () {
+        const searchValue = this.value;
+        const columnIndex = parseInt(searchColumnProgram.val());
+
+        dataTable.search("");
+        dataTable.columns().search("");
+
+        if (columnIndex === -1) {
+          dataTable.search(searchValue).draw();
+        } else {
+          dataTable.column(columnIndex).search(searchValue).draw();
+        }
+      });
+
+      searchColumnProgram.on("change", function () {
+        dataTable.search("");
+        dataTable.columns().search("");
+        searchInputProgram.val("");
+        dataTable.draw();
+      });
+    }
+  } else if (isCollegePage) {
+    // ===============================================
+    // COLLEGES DATATABLE
+    // ===============================================
+
+    dataTable = dataTableElement.DataTable({
+      processing: true,
+      serverSide: true,
+      language: {
+        processing: "",
+      },
+      ajax: {
+        url: "/colleges/data",
+        type: "GET",
+      },
+      columns: [
+        { data: "collegecode" },
+        { data: "collegename" },
+        {
+          data: null,
+          render: function (data, type, row) {
+            return `
+              <a href="#" class="btn btn-primary btn-sm btn-edit">
+                <i class="bi bi-pencil-square"></i> Edit
+              </a>
+              <a href="#" class="btn btn-danger btn-sm btn-delete">
+                <i class="bi bi-trash"></i> Delete
+              </a>
+             `;
+          },
+          orderable: false,
+        },
+      ],
+      pageLength: 10,
+      lengthChange: true,
+      searching: true,
+      order: [[0, "asc"]],
+      dom: '<"row"<"col-sm-12"tr>><"row mt-3"<"col-sm-12 col-md-5 d-flex align-items-center gap-3"l i><"col-sm-12 col-md-7 d-flex justify-content-end"p>>',
+    });
+
+    const searchColumnCollege = $("#searchByColumnCollege");
+    const searchInputCollege = $("#customSearchCollege");
+
+    if (searchColumnCollege.length && searchInputCollege.length) {
+      searchInputCollege.on("keyup", function () {
+        const searchValue = this.value;
+        const columnIndex = parseInt(searchColumnCollege.val());
+
+        dataTable.search("");
+        dataTable.columns().search("");
+
+        if (columnIndex === -1) {
+          dataTable.search(searchValue).draw();
+        } else {
+          dataTable.column(columnIndex).search(searchValue).draw();
+        }
+      });
+
+      searchColumnCollege.on("change", function () {
+        dataTable.search("");
+        dataTable.columns().search("");
+        searchInputCollege.val("");
+        dataTable.draw();
+      });
+    }
+  } else {
+    dataTable = dataTableElement.DataTable({
+      pageLength: 10,
+      lengthChange: true,
+      searching: true,
     });
   }
-
-  const dataTable = $("#data-table").DataTable({
-    pageLength: 10,
-    lengthChange: true,
-    searching: true,
-    order: [],
-    dom: '<"row"<"col-sm-12"tr>><"row mt-3"<"col-sm-12 col-md-5 d-flex align-items-center gap-3"l i><"col-sm-12 col-md-7 d-flex justify-content-end"p>>',
-    columnDefs: columnDefs,
-  });
 
   const dashboardTable = $("#dashboard-table").DataTable({
     pageLength: 5,
     lengthChange: false,
     searching: false,
   });
-
-  // rest of your code...
-
-  // ================================
-  // SEARCH FUNCTIONS
-  // ================================
-
-  // college search
-  const searchColumnCollege = $("#searchByColumnCollege");
-  const searchInputCollege = $("#customSearchCollege");
-
-  if (searchColumnCollege.length && searchInputCollege.length && dataTable) {
-    searchInputCollege.on("keyup", function () {
-      const searchValue = this.value;
-      const columnIndex = parseInt(searchColumnCollege.val());
-      dataTable.search("");
-      dataTable.columns().search("");
-      if (columnIndex === -1) {
-        dataTable.search(searchValue).draw();
-      } else {
-        dataTable.column(columnIndex).search(searchValue).draw();
-      }
-    });
-
-    searchColumnCollege.on("change", function () {
-      dataTable.search("");
-      dataTable.columns().search("");
-      searchInputCollege.val("");
-      dataTable.draw();
-    });
-  }
-
-  // program search
-  const searchColumnProgram = $("#searchByColumnProgram");
-  const searchInputProgram = $("#customSearchProgram");
-
-  if (searchColumnProgram.length && searchInputProgram.length && dataTable) {
-    searchInputProgram.on("keyup", function () {
-      const searchValue = this.value;
-      const columnIndex = parseInt(searchColumnProgram.val());
-      dataTable.search("");
-      dataTable.columns().search("");
-      if (columnIndex === -1) {
-        dataTable.search(searchValue).draw();
-      } else {
-        dataTable.column(columnIndex).search(searchValue).draw();
-      }
-    });
-
-    searchColumnProgram.on("change", function () {
-      dataTable.search("");
-      dataTable.columns().search("");
-      searchInputProgram.val("");
-      dataTable.draw();
-    });
-  }
-
-  // student search
-  const searchColumnStudent = $("#searchByColumnStudent");
-  const searchInputStudent = $("#customSearchStudent");
-
-  if (searchColumnStudent.length && searchInputStudent.length && dataTable) {
-    searchInputStudent.on("keyup", function () {
-      const searchValue = this.value;
-      const columnIndex = parseInt(searchColumnStudent.val());
-      dataTable.search("");
-      dataTable.columns().search("");
-      if (columnIndex === -1) {
-        dataTable.search(searchValue).draw();
-      } else {
-        dataTable.column(columnIndex).search(searchValue).draw();
-      }
-    });
-
-    searchColumnStudent.on("change", function () {
-      dataTable.search("");
-      dataTable.columns().search("");
-      searchInputStudent.val("");
-      dataTable.draw();
-    });
-  }
 
   // Sidebar Toggle
   const toggleBtn = document.getElementById("toggle-btn");
@@ -249,15 +409,54 @@ $(document).ready(function () {
   $(document).on("click", ".btn-edit", function (e) {
     e.preventDefault();
 
+    let programCode, programName, collegeCode;
     const row = $(this).closest("tr");
-    const collegeCode = row.find("td:eq(0)").text().trim();
-    const collegeName = row.find("td:eq(1)").text().trim();
 
-    $("#originalCollegeCode").val(collegeCode);
-    $("#editCollegeCode").val(collegeCode);
-    $("#editCollegeName").val(collegeName);
+    if (isProgramPage && dataTable) {
+      const data = dataTable.row(row).data();
+      if (data) {
+        programCode = data.code;
+        programName = data.name;
+        collegeCode = data.college_code;
+      }
+      if ($("#editProgramModal").length) {
+        $("#editOriginalProgramCode").val(programCode);
+        $("#editProgramCode").val(programCode);
+        $("#editProgramName").val(programName);
+        $("#editProgramCollege").val(collegeCode);
+        $("#editProgramModal").modal("show");
+      }
+      return;
+    }
 
-    $("#editCollegeModal").modal("show");
+    if (isCollegePage && dataTable) {
+      const data = dataTable.row(row).data();
+      let code, name;
+      if (data) {
+        code = data.collegecode;
+        name = data.collegename;
+      }
+      $("#originalCollegeCode").val(code);
+      $("#editCollegeCode").val(code);
+      $("#editCollegeName").val(name);
+      $("#editCollegeModal").modal("show");
+      return;
+    }
+
+    // ============================================
+    // FALLBACK
+    // ============================================
+
+    const col0 = row.find("td:eq(0)").text().trim();
+    const col1 = row.find("td:eq(1)").text().trim();
+    const col2 = row.find("td:eq(2)").text().trim();
+
+    if ($("#editCollegeModal").length && !isProgramPage) {
+      $("#originalCollegeCode").val(col0);
+      $("#editCollegeCode").val(col0);
+      $("#editCollegeName").val(col1);
+      $("#editCollegeModal").modal("show");
+    }
   });
 
   $("#editCollegeCode").on("input", function () {
@@ -312,10 +511,32 @@ $(document).ready(function () {
   $(document).on("click", ".btn-delete", function (e) {
     e.preventDefault();
     const row = $(this).closest("tr");
-    const code = row.find("td:eq(0)").text().trim();
+    let code;
 
-    $("#deleteCollegeCode").val(code);
-    $("#deleteCollegeModal").modal("show");
+    if (isProgramPage && dataTable) {
+      const data = dataTable.row(row).data();
+      code = data ? data.code : row.find("td:eq(0)").text().trim();
+      $("#deleteProgramCode").val(code);
+      $("#deleteProgramModal").modal("show");
+    } else if (isCollegePage && dataTable) {
+      const data = dataTable.row(row).data();
+      code = data ? data.collegecode : row.find("td:eq(0)").text().trim();
+      $("#deleteCollegeCode").val(code);
+      $("#deleteCollegeModal").modal("show");
+    }
+    // Fallback
+    else {
+      const header = dataTableElement.find("th:first").text().trim();
+      code = row.find("td:eq(0)").text().trim();
+
+      if (header === "College Code") {
+        $("#deleteCollegeCode").val(code);
+        $("#deleteCollegeModal").modal("show");
+      } else {
+        $("#deleteProgramCode").val(code);
+        $("#deleteProgramModal").modal("show");
+      }
+    }
   });
 
   $("#confirmDeleteBtn").click(function () {
@@ -386,23 +607,6 @@ $(document).ready(function () {
     });
   });
 
-  //EDIT
-  $(document).on("click", ".btn-edit", function (e) {
-    e.preventDefault();
-    const row = $(this).closest("tr");
-
-    const programCode = row.find("td:eq(0)").text().trim();
-    const programName = row.find("td:eq(1)").text().trim();
-    const collegeCode = row.find("td:eq(2)").text().trim();
-
-    $("#editOriginalProgramCode").val(programCode);
-    $("#editProgramCode").val(programCode);
-    $("#editProgramName").val(programName);
-    $("#editProgramCollege").val(collegeCode);
-
-    $("#editProgramModal").modal("show");
-  });
-
   $("#editProgramCode").on("input", function () {
     this.value = this.value.replace(/[^A-Za-z]/g, "");
   });
@@ -453,16 +657,6 @@ $(document).ready(function () {
     });
   });
 
-  // DELETE
-  $(document).on("click", ".btn-delete", function (e) {
-    e.preventDefault();
-    const row = $(this).closest("tr");
-    const programCode = row.find("td:eq(0)").text().trim();
-
-    $("#deleteProgramCode").val(programCode);
-    $("#deleteProgramModal").modal("show");
-  });
-
   $("#confirmDeleteProgramBtn").click(function () {
     const programCode = $("#deleteProgramCode").val();
 
@@ -478,11 +672,6 @@ $(document).ready(function () {
   // STUDENTS PAGE
   // ================================
 
-  // ================================
-  // STUDENTS PAGE - IMAGE UPLOAD
-  // ================================
-
-  // Register student image function
   $(document).ready(function () {
     const dropZone = document.getElementById("dropZone");
     const fileInput = document.getElementById("studentImage");
@@ -494,13 +683,11 @@ $(document).ready(function () {
     const chooseImageBtn = document.getElementById("chooseImageBtn");
 
     if (dropZone && fileInput && chooseImageBtn) {
-      // Choose Image button click
       chooseImageBtn.addEventListener("click", (e) => {
         e.preventDefault();
         fileInput.click();
       });
 
-      // Dropzone click (for drag and drop area only)
       dropZone.addEventListener("click", () => {
         fileInput.click();
       });
@@ -553,7 +740,7 @@ $(document).ready(function () {
               fileName.textContent = file.name;
               dropZoneContent.classList.add("d-none");
               imagePreview.classList.remove("d-none");
-              removeImageBtn.classList.remove("d-none"); // Show remove button
+              removeImageBtn.classList.remove("d-none");
             };
             reader.readAsDataURL(file);
           }
@@ -568,7 +755,7 @@ $(document).ready(function () {
         fileName.textContent = "";
         imagePreview.classList.add("d-none");
         dropZoneContent.classList.remove("d-none");
-        removeImageBtn.classList.add("d-none"); // Hide remove button
+        removeImageBtn.classList.add("d-none");
       });
     }
 
@@ -583,13 +770,11 @@ $(document).ready(function () {
     const editChooseImageBtn = document.getElementById("editChooseImageBtn");
 
     if (editDropZone && editFileInput && editChooseImageBtn) {
-      // Choose Image button click
       editChooseImageBtn.addEventListener("click", (e) => {
         e.preventDefault();
         editFileInput.click();
       });
 
-      // Dropzone click (for drag and drop area only)
       editDropZone.addEventListener("click", () => {
         editFileInput.click();
       });
@@ -642,7 +827,7 @@ $(document).ready(function () {
               editFileName.textContent = file.name;
               editDropZoneContent.classList.add("d-none");
               editImagePreview.classList.remove("d-none");
-              editRemoveImageBtn.classList.remove("d-none"); // Show remove button
+              editRemoveImageBtn.classList.remove("d-none");
               $("#removeImageFlag").val("0");
             };
             reader.readAsDataURL(file);
@@ -658,7 +843,7 @@ $(document).ready(function () {
         editFileName.textContent = "";
         editImagePreview.classList.add("d-none");
         editDropZoneContent.classList.remove("d-none");
-        editRemoveImageBtn.classList.add("d-none"); // Hide remove button
+        editRemoveImageBtn.classList.add("d-none");
         $("#removeImageFlag").val("1");
       });
 
@@ -668,12 +853,13 @@ $(document).ready(function () {
         editFileName.textContent = "";
         editImagePreview.classList.add("d-none");
         editDropZoneContent.classList.remove("d-none");
-        editRemoveImageBtn.classList.add("d-none"); // Hide remove button on modal close
+        editRemoveImageBtn.classList.add("d-none");
+        $("#removeImageFlag").val("0");
       });
     }
   });
 
-  // REGISTER
+  // REGISTER STUDENT
   $("#idNumber").on("input", function () {
     let value = this.value.toUpperCase();
     value = value.replace(/[^0-9-]/g, "");
@@ -751,29 +937,30 @@ $(document).ready(function () {
     });
   });
 
-  // EDIT
-  $(document).on("click", ".btn-edit", function (e) {
-    e.preventDefault();
-    const row = $(this).closest("tr");
-    const imageCell = row.find("td:eq(0)");
-    const imageElement = imageCell.find("img");
-    const imageUrl = imageElement.length ? imageElement.attr("src") : null;
-    const idNumber = row.find("td:eq(1)").text().trim();
-    const firstName = row.find("td:eq(2)").text().trim();
-    const lastName = row.find("td:eq(3)").text().trim();
-    const programCode = row.find("td:eq(4)").text().trim();
-    const yearLevel = row.find("td:eq(5)").text().trim();
-    const gender = row.find("td:eq(6)").text().trim();
+  // EDIT STUDENT
+  $(document).on("click", "#data-table .btn-edit", function (e) {
+    if (!isStudentPage) return;
 
-    $("#editOriginalStudentId").val(idNumber);
-    $("#editStudentId").val(idNumber);
-    $("#editStudentFirstName").val(firstName);
-    $("#editStudentLastName").val(lastName);
-    $("#editStudentProgram").val(programCode);
-    $("#editStudentYearLevel").val(yearLevel);
-    $("#editStudentGender").val(gender);
-    if (imageUrl && !imageUrl.includes("default-avatar")) {
-      $("#editPreviewImg").attr("src", imageUrl);
+    e.preventDefault();
+    e.stopPropagation();
+
+    const row = $(this).closest("tr");
+    const data = dataTable.row(row).data().DT_RowData;
+
+    $("#editOriginalStudentId").val(data.id_number);
+    $("#editStudentId").val(data.id_number);
+    $("#editStudentFirstName").val(data.first_name);
+    $("#editStudentLastName").val(data.last_name);
+    $("#editStudentProgram").val(data.program_code);
+    $("#editStudentYearLevel").val(data.year_level);
+    $("#editStudentGender").val(data.gender);
+
+    const defaultAvatarUrl = row
+      .find("img")
+      .attr("onerror")
+      .match(/'(.*)'/)[1];
+    if (data.image_url && !data.image_url.includes("default-avatar")) {
+      $("#editPreviewImg").attr("src", data.image_url);
       $("#editFileName").text("Current image");
       $("#editDropZoneContent").addClass("d-none");
       $("#editImagePreview").removeClass("d-none");
@@ -850,8 +1037,6 @@ $(document).ready(function () {
       contentType: "application/json",
       data: JSON.stringify({
         id_number: idNumber,
-        first_name: firstName,
-        last_name: lastName,
         original_id: originalId,
       }),
       success: function (response) {
@@ -870,14 +1055,19 @@ $(document).ready(function () {
     });
   });
 
-  // DELETE
-  $(document).on("click", ".btn-delete", function (e) {
-    e.preventDefault();
-    const row = $(this).closest("tr");
-    const studentId = row.find("td:eq(1)").text().trim();
+  // DELETE STUDENT
+  $(document).on("click", "#data-table .btn-delete", function (e) {
+    if (isStudentPage) {
+      e.preventDefault();
+      e.stopPropagation();
 
-    $("#deleteStudentId").val(studentId);
-    $("#deleteStudentModal").modal("show");
+      const row = $(this).closest("tr");
+      const data = dataTable.row(row).data().DT_RowData;
+      const studentId = data.id_number;
+
+      $("#deleteStudentId").val(studentId);
+      $("#deleteStudentModal").modal("show");
+    }
   });
 
   $("#confirmDeleteStudentBtn").click(function () {
@@ -894,7 +1084,6 @@ $(document).ready(function () {
 // RESET MODALS ON CLOSE
 // ================================
 
-// reset college modals
 $("#registerCollegeModal").on("hidden.bs.modal", function () {
   $("#registerCollegeForm")[0].reset();
 });
@@ -907,7 +1096,6 @@ $("#deleteCollegeModal").on("hidden.bs.modal", function () {
   $("#deleteForm")[0].reset();
 });
 
-// reset program modals
 $("#registerProgramModal").on("hidden.bs.modal", function () {
   $("#registerProgramForm")[0].reset();
 });
@@ -920,11 +1108,8 @@ $("#deleteProgramModal").on("hidden.bs.modal", function () {
   $("#deleteProgramForm")[0].reset();
 });
 
-// reset students modals
 $("#registerStudentModal").on("hidden.bs.modal", function () {
   $("#registerStudentForm")[0].reset();
-
-  // reset register image field
   const fileInput = document.getElementById("studentImage");
   const previewImg = document.getElementById("previewImg");
   const fileName = document.getElementById("fileName");
@@ -940,8 +1125,6 @@ $("#registerStudentModal").on("hidden.bs.modal", function () {
 
 $("#editStudentModal").on("hidden.bs.modal", function () {
   $("#editStudentForm")[0].reset();
-
-  // reset edit image field
   const editFileInput = document.getElementById("editStudentImage");
   const editPreviewImg = document.getElementById("editPreviewImg");
   const editFileName = document.getElementById("editFileName");
@@ -968,41 +1151,40 @@ $(document).on("click", "#data-table tbody tr", function (e) {
     return;
   }
 
-  const row = $(this);
-  const imageCell = row.find("td:eq(0)");
-  const imageElement = imageCell.find("img");
-  const imageUrl = imageElement.length ? imageElement.attr("src") : null;
-  const idNumber = row.find("td:eq(1)").text().trim();
-  const firstName = row.find("td:eq(2)").text().trim();
-  const lastName = row.find("td:eq(3)").text().trim();
-  const programCode = row.find("td:eq(4)").text().trim();
-  const yearLevel = row.find("td:eq(5)").text().trim();
-  const gender = row.find("td:eq(6)").text().trim();
-  const programName = row.attr("data-program-name") || "N/A";
-  const collegeCode = row.attr("data-college-code") || "N/A";
-  const collegeName = row.attr("data-college-name") || "N/A";
+  const dataTableElement = $("#data-table");
+  const firstHeaderText = dataTableElement.find("thead th:first").text().trim();
+  if (firstHeaderText !== "Photo") return;
 
-  $("#viewStudentId").text(idNumber);
-  $("#viewStudentFirstName").text(firstName);
-  $("#viewStudentLastName").text(lastName);
-  $("#viewStudentProgram").text(programCode);
-  $("#viewStudentProgramFull").text(programName);
-  $("#viewStudentCollegeCode").text(collegeCode);
-  $("#viewStudentCollegeName").text(collegeName);
-  $("#viewStudentYearLevel").text(yearLevel);
-  $("#viewStudentGender").text(gender);
+  const row = $(this);
+  const dataTable = $("#data-table").DataTable();
+  if (!dataTable.row) return;
+
+  const data = dataTable.row(row).data().DT_RowData;
+
+  const defaultAvatar = row
+    .find("img")
+    .attr("onerror")
+    .match(/'(.*)'/)[1];
+
+  $("#viewStudentId").text(data.id_number);
+  $("#viewStudentFirstName").text(data.first_name);
+  $("#viewStudentLastName").text(data.last_name);
+  $("#viewStudentProgram").text(data.program_code);
+  $("#viewStudentProgramFull").text(data.program_name || "N/A");
+  $("#viewStudentCollegeCode").text(data.college_code || "N/A");
+  $("#viewStudentCollegeName").text(data.college_name || "N/A");
+  $("#viewStudentYearLevel").text(data.year_level);
+  $("#viewStudentGender").text(data.gender);
 
   $("#viewStudentImage").addClass("d-none");
   $("#viewStudentInitials").addClass("d-none").removeClass("d-flex");
 
-  if (imageUrl) {
-    $("#viewStudentImage").attr("src", imageUrl).removeClass("d-none");
+  if (data.image_url) {
+    $("#viewStudentImage").attr("src", data.image_url).removeClass("d-none");
   } else {
-    const initials = firstName[0] + lastName[0];
-    $("#viewStudentInitials")
-      .text(initials)
-      .removeClass("d-none")
-      .addClass("d-flex");
+    $("#viewStudentImage")
+      .attr("src", data.default_avatar)
+      .removeClass("d-none");
   }
   $("#viewStudentModal").modal("show");
 });

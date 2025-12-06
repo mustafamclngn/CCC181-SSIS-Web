@@ -7,8 +7,49 @@ college_bp = Blueprint("college", __name__, template_folder="templates")
 @college_bp.route("/colleges")
 @login_required
 def colleges():
-    colleges_list = CollegeModel.get_all_colleges()
-    return render_template("colleges.html", colleges=colleges_list)
+    return render_template("colleges.html", colleges=[])
+
+
+@college_bp.route("/colleges/data")
+@login_required
+def colleges_data():
+    try:
+        draw = request.args.get("draw", type=int)
+        start = request.args.get("start", type=int)
+        length = request.args.get("length", type=int)
+        
+        search_value = request.args.get("search[value]", "")
+        
+        order_column_index = request.args.get("order[0][column]", type=int)
+        order_dir = request.args.get("order[0][dir]", "asc")
+        
+        columns_map = {0: "collegecode", 1: "collegename"}
+        sort_column = columns_map.get(order_column_index, "collegecode")
+        
+        code_filter = request.args.get("columns[0][search][value]", "")
+        name_filter = request.args.get("columns[1][search][value]", "")
+
+        result = CollegeModel.get_colleges_server_side(
+            draw=draw,
+            start=start,
+            length=length,
+            search_value=search_value,
+            sort_column=sort_column,
+            sort_direction=order_dir,
+            code_filter=code_filter,
+            name_filter=name_filter
+        )
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        return jsonify({
+            "error": str(e),
+            "draw": 1,
+            "recordsTotal": 0,
+            "recordsFiltered": 0,
+            "data": []
+        }), 500
 
 
 # ========= CHECK IF COLLEGE EXISTS (AJAX) =========

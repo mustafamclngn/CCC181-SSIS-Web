@@ -11,14 +11,35 @@ program_bp = Blueprint("program", __name__, template_folder="templates")
 @login_required
 def programs():
     colleges_list = ProgramModel.get_all_colleges()
-    programs_list = ProgramModel.get_all_programs()
-
     return render_template(
         "programs.html",
-        programs=programs_list,
         colleges=colleges_list
     )
 
+@program_bp.route("/programs/data")
+@login_required
+def programs_data():
+    try:
+        draw = int(request.args.get('draw', 1))
+        start = int(request.args.get('start', 0))
+        length = int(request.args.get('length', 10))
+        search_value = request.args.get('search[value]', '')
+        
+        order_column = int(request.args.get('order[0][column]', 0))
+        order_dir = request.args.get('order[0][dir]', 'asc')
+
+        column_filters = {}
+        for i in range(3):
+            val = request.args.get(f'columns[{i}][search][value]', '')
+            if val:
+                column_filters[i] = val
+
+        data = ProgramModel.get_programs_server_side(
+            start, length, draw, search_value, order_column, order_dir, column_filters
+        )
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # ========= CHECK IF PROGRAM EXISTS (AJAX) =========
 @program_bp.route("/programs/check", methods=["POST"])

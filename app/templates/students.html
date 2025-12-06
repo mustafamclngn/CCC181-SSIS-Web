@@ -14,14 +14,23 @@
       <h3>Student Records</h3>
       <p class="text-muted mb-0">View and Manage all registered students</p>
     </div>
-    <a
-      href="#"
-      class="btn btn-success"
-      data-bs-toggle="modal"
-      data-bs-target="#registerStudentModal"
-    >
-      <i class="bi bi-plus-lg"></i> Register Student
-    </a>
+    <div class="d-flex gap-2">
+      <button
+        class="btn btn-outline-primary"
+        data-bs-toggle="modal"
+        data-bs-target="#filterStudentModal"
+      >
+        <i class="bi bi-funnel"></i> Filter
+      </button>
+      <a
+        href="#"
+        class="btn btn-success"
+        data-bs-toggle="modal"
+        data-bs-target="#registerStudentModal"
+      >
+        <i class="bi bi-plus-lg"></i> Register Student
+      </a>
+    </div>
   </div>
 
   <!-- search -->
@@ -45,6 +54,78 @@
         placeholder="Enter search input here..."
         data-table-search="input"
       />
+    </div>
+  </div>
+
+  <!-- ================== FILTER STUDENT MODAL ================== -->
+  <div
+    class="modal fade"
+    id="filterStudentModal"
+    tabindex="-1"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="bi bi-funnel me-2"></i>Filter Students
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <!-- Gender Filter -->
+          <div class="mb-3">
+            <label for="filterGender" class="form-label">Gender</label>
+            <select class="form-select" id="filterGender">
+              <option value="">All Genders</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+
+          <!-- Year Level Filter -->
+          <div class="mb-3">
+            <label for="filterYearLevel" class="form-label">Year Level</label>
+            <select class="form-select" id="filterYearLevel">
+              <option value="">All Year Levels</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+            </select>
+          </div>
+
+          <!-- Program Code Filter -->
+          <div class="mb-3">
+            <label for="filterProgramCode" class="form-label">Program</label>
+            <select class="form-select" id="filterProgramCode">
+              <option value="">All Programs</option>
+              {% for program in programs %}
+              <option value="{{ program.code }}">
+                {{ program.code }} - {{ program.name }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="clearFiltersBtn">
+            <i class="bi bi-x-circle"></i> Clear Filters
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            id="applyFiltersBtn"
+            data-bs-dismiss="modal"
+          >
+            <i class="bi bi-check-circle"></i> Apply Filters
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -86,7 +167,7 @@
         <td>{{ student.id_number }}</td>
         <td>{{ student.first_name }}</td>
         <td>{{ student.last_name }}</td>
-        <td>{{ student.program_code }}</td>
+        <td>{{ student.program_code or 'None' }}</td>
         <td>{{ student.year_level }}</td>
         <td>{{ student.gender }}</td>
         <td>

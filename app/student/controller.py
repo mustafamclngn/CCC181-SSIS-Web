@@ -81,19 +81,94 @@ def delete_student_image(image_url):
 @login_required
 def students():
     programs_list = StudentModel.get_all_programs()
-    students_list = StudentModel.get_all_students()
     default_avatar = get_default_avatar_url()
-
+    
     return render_template(
         "students.html",
         page_title="Students",
-        students=students_list,
         programs=programs_list,
         default_avatar=default_avatar
     )
 
+@student_bp.route("/students/data", methods=["GET"])
+@login_required
+def students_data():
+    try:
+        draw = int(request.args.get('draw', 1))
+        start = int(request.args.get('start', 0))
+        length = int(request.args.get('length', 10))
+        
+        search_value = request.args.get('search[value]', '')
+        
+        order_column_index = int(request.args.get('order[0][column]', 1))
+        order_direction = request.args.get('order[0][dir]', 'asc')
+        
+        filter_gender = request.args.get('filter_gender', '')
+        filter_year = request.args.get('filter_year', '')
+        filter_program = request.args.get('filter_program', '')
+        
+        results = StudentModel.get_all_students(
+            start, 
+            length, 
+            draw, 
+            search_value, 
+            order_column_index, 
+            order_direction,
+            filter_gender,
+            filter_year,
+            filter_program
+        )
+        
+        default_avatar = get_default_avatar_url()
+
+        final_data_array = []
+        for student in results['data']:
+            image_url = student['image_url'] or default_avatar
+
+            row = {
+                '0': image_url,
+                '1': student['id_number'],
+                '2': student['first_name'],
+                '3': student['last_name'],
+                '4': student['program_code'],
+                '5': student['year_level'],
+                '6': student['gender'],
+                '7': None,
+                'DT_RowData': {
+                    'id_number': student['id_number'],
+                    'first_name': student['first_name'],
+                    'last_name': student['last_name'],
+                    'gender': student['gender'],
+                    'year_level': student['year_level'],
+                    'program_code': student['program_code'],
+                    'image_url': image_url,
+                    'program_name': student['programname'],
+                    'college_code': student['collegecode'],
+                    'college_name': student['collegename'],
+                    'default_avatar': default_avatar
+                }
+            }
+            final_data_array.append(row)
+            
+        return jsonify({
+            "draw": results['draw'],
+            "recordsTotal": results['recordsTotal'],
+            "recordsFiltered": results['recordsFiltered'],
+            "data": final_data_array
+        })
+
+    except Exception as e:
+        print(f"Error serving students data: {e}")
+        return jsonify({
+            "draw": int(request.args.get('draw', 1)),
+            "recordsTotal": 0,
+            "recordsFiltered": 0,
+            "data": []
+        }), 500
+
+
 # ==============================
-# CHECK IF STUDENT EXISTS (AJAX)
+# CHECK IF STUDENT EXISTS
 # ==============================
 @student_bp.route("/students/check", methods=["POST"])
 @login_required
