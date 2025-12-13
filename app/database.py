@@ -33,3 +33,4 @@ def close_db(e=None):
             except:
                 pass
         db_pool.putconn(db)
+        
