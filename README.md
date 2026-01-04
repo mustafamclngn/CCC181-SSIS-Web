@@ -8,7 +8,7 @@
 ![Flask](https://img.shields.io/badge/Flask-3.1.2-5DADE2?logo=flask&logoColor)
 ![Python](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14+-336791?logo=postgresql&logoColor=white)
-![Supabase](https://img.shields.io/badge/Supabase-Storage-3ECF8E?logo=supabase&logoColor)
+![Supabase](https://img.shields.io/badge/Supabase-Image%20Storage-3ECF8E?logo=supabase&logoColor)
 ![Git](https://img.shields.io/badge/Git-Version%20Control-F05032?logo=git&logoColor=white)
 
 </div>
@@ -22,18 +22,16 @@ This system is built using **HTML/CSS**, **Vanilla JavaScript**, **Flask**, and 
 ## Technologies Used
 
 - **Frontend**
-  - HTML
-  - CSS
-  - Vanilla JavaScript
+  - HTML - Markup Structure
+  - CSS - Styling and responsive design
+  - JavaScript - Interactive design and functionality
 
 - **Backend**
   - Flask (Python)
 
-- **Database**
-  - PostgreSQL
-
-- **File Storage**
-  - Supabase Storage (Bucket) for student images
+- **Database & Image Storage**
+  - PostgreSQL - Relational database for authentication and data storage
+  - Supabase Bucket - Cloud-based image storing
 
 - **Version Control**
   - Git & GitHub
