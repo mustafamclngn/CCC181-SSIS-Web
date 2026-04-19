@@ -1,65 +1,63 @@
 <div align="center">
 
-# MOSAIC - Student Management System
+# MOSAIC
+### Student Management System
 
 ![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?logo=javascript&logoColor)
-![Flask](https://img.shields.io/badge/Flask-3.1.2-5DADE2?logo=flask&logoColor)
-![Python](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor)
+![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?logo=javascript&logoColor=black)
+![Flask](https://img.shields.io/badge/Flask-3.1.2-5DADE2?logo=flask&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14+-336791?logo=postgresql&logoColor=white)
-![Supabase](https://img.shields.io/badge/Supabase-Image%20Storage-3ECF8E?logo=supabase&logoColor)
+![Supabase](https://img.shields.io/badge/Supabase-Image%20Storage-3ECF8E?logo=supabase&logoColor=white)
 ![Git](https://img.shields.io/badge/Git-Version%20Control-F05032?logo=git&logoColor=white)
+
+**A centralized web-based platform for managing student records, academic programs, and college information.**
 
 </div>
 
-**MOSAIC** is a web-based student management system application designed to manage student records efficiently and accurately. It provides a centralized platform for maintaining student, program, and college information with full CRUD functionality, advanced searching, sorting, and pagination.
+---
 
-This system is built using **HTML/CSS**, **Vanilla JavaScript**, **Flask**, and **PostgreSQL**, with **Supabase Storage (Bucket)** used for uploading and storing student photos.
+## Overview
+
+MOSAIC is a student management system built with Vanilla JavaScript, Flask, and PostgreSQL. It provides full CRUD functionality across students, programs, and colleges — with support for photo uploads, advanced search, field-based sorting, and pagination for large datasets.
 
 ---
 
-## Technologies Used
-
-- **Frontend**
-  - HTML - Markup Structure
-  - CSS - Styling and responsive design
-  - JavaScript - Interactive design and functionality
-
-- **Backend**
-  - Flask (Python)
-
-- **Database & Image Storage**
-  - PostgreSQL - Relational database for authentication and data storage
-  - Supabase Bucket - Cloud-based image storing
-
-- **Version Control**
-  - Git & GitHub
-
----
-
-## System Features
+## Features
 
 ### Student Management
-- Create, view, update, delete, and list student records
-- Upload student photos (optional)
+- Add, view, edit, and delete student records
+- Upload optional student photos (stored via Supabase Bucket)
 - Student ID format: `YYYY-NNNN`
-- Assign students to programs and colleges
+- Assign students to their respective programs and colleges
 
 ### Program Management
-- Create, view, update, delete, and list academic programs
-- Associate programs with colleges
+- Full CRUD for academic programs
+- Link programs to their parent college
 
 ### College Management
-- Create, view, update, delete, and list colleges
+- Full CRUD for colleges
 
 ### Data Handling
-- Searching across records
-- Sorting by different fields
-- Pagination for large datasets
+- Search across all records
+- Sort by multiple fields
+- Pagination support for large datasets
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | HTML5, CSS3, JavaScript (ES6+) |
+| Backend | Flask (Python 3.13) |
+| Database | PostgreSQL 14+ |
+| Image Storage | Supabase Bucket |
+| Version Control | Git & GitHub |
 
 ---
 
 ## License
 
-This project is intended for **academic and educational purposes only**
+This project is intended for **academic and educational purposes only**.
